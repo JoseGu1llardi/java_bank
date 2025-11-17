@@ -3,6 +3,7 @@ package model.entity;
 import model.enums.TransactionType;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -26,15 +27,23 @@ public class Transaction {
                        String destinationAccount, String description) {
         this.id = UUID.randomUUID().toString();
         this.type = type;
-        this.amount = amount;
-        this.previousBalance = previousBalance;
-        this.balanceAfter = balanceAfter;
+        this.amount = amount.setScale(2, RoundingMode.HALF_EVEN);
+        this.previousBalance = previousBalance.setScale(2, RoundingMode.HALF_EVEN);
+        this.balanceAfter = calculateBalanceAfter();
         this.dateTime = LocalDateTime.now();
         this.originAccount = originAccount;
         this.destinationAccount = destinationAccount;
         this.description = description;
         this.authenticationCode = generateAuthenticationCode();
+    }
 
+    private BigDecimal calculateBalanceAfter() {
+        return switch (type) {
+            case DEPOSIT, TRANSFER_RECEIVED -> this.previousBalance.add(this.amount);
+            case WITHDRAW, TRANSFER_SENT, BILL_PAYMENT, PIX_PAYMENT, TED, DOC, FEE ->
+                previousBalance.subtract(this.amount);
+            default -> previousBalance;
+        };
     }
 
     private String generateAuthenticationCode() {
