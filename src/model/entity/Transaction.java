@@ -23,8 +23,8 @@ public class Transaction {
     private TransactionStatus status;
     private final String authenticationCode;
 
-    public Transaction(TransactionType type, BigDecimal amount, BigDecimal previousBalance,
-                       BigDecimal balanceAfter, String originAccount,
+    public Transaction(TransactionType type, BigDecimal amount,
+                       BigDecimal previousBalance, String originAccount,
                        String destinationAccount, String description) {
         this.id = UUID.randomUUID().toString();
         this.type = type;
@@ -55,10 +55,22 @@ public class Transaction {
     }
 
     public void confirm() {
+        if (this.status == TransactionStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot confirm a cancelled transaction.");
+        }
+        if (this.status == TransactionStatus.CONFIRMED) {
+            throw new IllegalStateException("Cannot confirm a confirmed transaction.");
+        }
         this.status = TransactionStatus.CONFIRMED;
     }
 
     public void cancel() {
+        if (this.status == TransactionStatus.CONFIRMED) {
+            throw new IllegalStateException("Cannot cancel a confirmed transaction.");
+        }
+        if (this.status == TransactionStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot cancel a confirmed transaction.");
+        }
         this.status = TransactionStatus.CANCELLED;
     }
 
