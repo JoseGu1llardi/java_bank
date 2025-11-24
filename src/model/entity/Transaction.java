@@ -120,8 +120,13 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return String.format("[%s] %s - $ %.2f | Balance: $ %.2f | Status: %s | Auth: %s",
-                dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
-                type.getDescription(), amount, balanceAfter, status, authenticationCode);
+        return String.format(
+                "Transaction[ID: %s | %s | Amount: $ %.2f | Date: %s | Status: %s]",
+                id.substring(0, 8), // shows only part of the ID
+                type.getDescription(),
+                amount,
+                dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
+                status.getDescription()
+        );
     }
 }
