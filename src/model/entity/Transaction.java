@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -159,4 +160,18 @@ public class Transaction {
                 description
         );
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return Objects.equals(id, that.id) && Objects.equals(authenticationCode, that.authenticationCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, authenticationCode);
+    }
 }
+
+// https://github.com/JoseGu1llardi/java_bank.git
