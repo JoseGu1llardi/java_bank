@@ -19,7 +19,7 @@ public enum TransactionType {
         this.value = description;
     }
 
-    public String getValue() {
+    public String getDescription() {
         return value;
     }
 }
