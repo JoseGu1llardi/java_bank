@@ -129,4 +129,34 @@ public class Transaction {
                 status.getDescription()
         );
     }
+
+    public String toDetailedString() {
+        return String.format(
+                """
+                Transaction Details:
+                ID: %s
+                Type: %s
+                Amount: $ %.2f
+                Previous Balance: $ %.2f
+                Balance After: $ %.2f
+                Date: %s
+                Origin: %s
+                Destination: %s
+                Status: %s
+                Auth Code: %s
+                Description: %s
+                """,
+                id,
+                type.getDescription(),
+                amount,
+                previousBalance,
+                balanceAfter,
+                dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+                originAccount != null ? originAccount : "N/A",
+                destinationAccount != null ? destinationAccount : "N/A",
+                status.getDescription(),
+                authenticationCode,
+                description
+        );
+    }
 }
