@@ -18,15 +18,15 @@ public class Transaction {
     private final BigDecimal previousBalance;
     private final BigDecimal balanceAfter;
     private final LocalDateTime dateTime;
-    private final String originAccount;
-    private final String destinationAccount;
+    private final Account originAccount;
+    private final Account destinationAccount;
     private final String description;
     private TransactionStatus status;
     private final String authenticationCode;
 
     public Transaction(TransactionType type, BigDecimal amount,
-                       BigDecimal previousBalance, String originAccount,
-                       String destinationAccount, String description) {
+                       BigDecimal previousBalance, Account originAccount,
+                       Account destinationAccount, String description) {
         this.id = UUID.randomUUID().toString();
         this.type = type;
         this.amount = amount.setScale(2, RoundingMode.HALF_EVEN);
@@ -99,11 +99,11 @@ public class Transaction {
         return dateTime;
     }
 
-    public String getOriginAccount() {
+    public Account getOriginAccount() {
         return originAccount;
     }
 
-    public String getDestinationAccount() {
+    public Account getDestinationAccount() {
         return destinationAccount;
     }
 
