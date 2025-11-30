@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class Account {
@@ -49,7 +50,7 @@ public abstract class Account {
         validateBalance(amount);
         validateActiveAccount();
 
-        if (destinationAccount == null || !destinationAccount.isActive()) {
+        if (destinationAccount == null || !destinationAccount.isActive) {
             throw new IllegalArgumentException("Invalid destination account.");
         }
 
@@ -133,11 +134,18 @@ public abstract class Account {
         return createdAt;
     }
 
-    public List<Transaction> getTransactions() {
-        return transactions;
-    }
-
     public boolean isActive() {
         return isActive;
+    }
+
+    public List<Transaction> getTransactions() {
+        return List.copyOf(transactions);
+    }
+
+    public void disable() {
+        this.isActive = false;
+    }
+    public void enable() {
+        this.isActive = true;
     }
 }
