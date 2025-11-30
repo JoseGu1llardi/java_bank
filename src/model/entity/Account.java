@@ -29,7 +29,7 @@ public abstract class Account {
         this.isActive = true;
     }
 
-    public void deposit(BigDecimal amount, String description) {
+    public void deposit(BigDecimal amount) {
         validateAmount(amount);
         validateActiveAccount();
 
@@ -37,7 +37,44 @@ public abstract class Account {
         this.balance = this.balance.add(amount);
 
         registerTransaction(TransactionType.DEPOSIT, amount, previousBalance,
-                null, this, description);
+                null, this, "Deposit made.");
+    }
+
+    public abstract void withdraw(BigDecimal amount);
+
+    public abstract BigDecimal calculateMonthlyFee();
+
+    public void transfer(BigDecimal amount, Account destinationAccount) {
+        validateAmount(amount);
+        validateActiveAccount();
+
+        if (destinationAccount == null || !destinationAccount.isActive()) {
+            throw new IllegalArgumentException("Invalid destination account.");
+        }
+
+        BigDecimal previousBalanceOrigin = this.balance;
+        BigDecimal previousBalanceDestination = destinationAccount.balance;
+
+        this.balance = this.balance.subtract(amount);
+        destinationAccount.balance = destinationAccount.balance.add(amount);
+
+        this.registerTransaction(
+                TransactionType.TRANSFER_SENT,
+                amount,
+                previousBalanceOrigin,
+                this,
+                destinationAccount,
+                "Transfer made to " + destinationAccount.number
+        );
+
+        destinationAccount.registerTransaction(
+                TransactionType.TRANSFER_RECEIVED,
+                amount,
+                previousBalanceDestination,
+                this,
+                destinationAccount,
+                "Transfer received from " + this.number
+        );
     }
 
     protected void validateAmount(BigDecimal amount) {
@@ -65,5 +102,33 @@ public abstract class Account {
 
     protected String generateAccountNumber() {
         return String.format("%08d", random.nextInt(100_000_000));
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public String getAgency() {
+        return agency;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public User getHolder() {
+        return holder;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public boolean isActive() {
+        return isActive;
     }
 }
