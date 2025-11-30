@@ -30,18 +30,24 @@ public abstract class Account {
         this.isActive = true;
     }
 
-    public void deposit(BigDecimal amount) {
+    public void deposit(BigDecimal amount,  String description) {
         validateActiveAccount();
         validateAmount(amount);
 
         BigDecimal previousBalance = this.balance;
         this.balance = this.balance.add(amount);
 
-        registerTransaction(TransactionType.DEPOSIT, amount, previousBalance,
-                null, this, "Deposit made.");
+        registerTransaction(
+                TransactionType.DEPOSIT,
+                amount,
+                previousBalance,
+                null,
+                this,
+                description == null ? "Deposit performed." : description
+        );
     }
 
-    public abstract void withdraw(BigDecimal amount);
+    public abstract void withdraw(BigDecimal amount, String description);
 
     public abstract BigDecimal calculateMonthlyFee();
 
@@ -104,7 +110,7 @@ public abstract class Account {
                                     BigDecimal previousBalance,
                                     Account origin,
                                     Account destination,
-                                    String description) {
+                                    String description ) {
 
         if ((type == TransactionType.TRANSFER_SENT || type == TransactionType.TRANSFER_RECEIVED)
         && (origin == null || destination == null)) {
