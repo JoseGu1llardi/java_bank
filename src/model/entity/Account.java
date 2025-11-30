@@ -46,6 +46,7 @@ public abstract class Account {
 
     public void transfer(BigDecimal amount, Account destinationAccount) {
         validateAmount(amount);
+        validateBalance(amount);
         validateActiveAccount();
 
         if (destinationAccount == null || !destinationAccount.isActive()) {
@@ -84,8 +85,16 @@ public abstract class Account {
     }
 
     protected void validateActiveAccount() {
-        if (!isActive) {
+        if (!isActive()) {
             throw new IllegalStateException("The account is not active.");
+        }
+    }
+
+    protected void validateBalance(BigDecimal amount) {
+        if (this.balance.compareTo(amount) < 0)  {
+            throw new IllegalArgumentException(
+                    "Insufficient funds. The balance must be greater than or equal to the requested amount."
+            );
         }
     }
 
