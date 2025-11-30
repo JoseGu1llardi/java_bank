@@ -15,7 +15,7 @@ public abstract class Account {
     protected BigDecimal balance;
     protected User holder;
     protected LocalDateTime createdAt;
-    protected List<Transaction> transactions;
+    protected final List<Transaction> transactions;
     protected boolean isActive;
 
     protected static final SecureRandom random = new SecureRandom();
@@ -31,8 +31,8 @@ public abstract class Account {
     }
 
     public void deposit(BigDecimal amount) {
-        validateAmount(amount);
         validateActiveAccount();
+        validateAmount(amount);
 
         BigDecimal previousBalance = this.balance;
         this.balance = this.balance.add(amount);
@@ -46,13 +46,13 @@ public abstract class Account {
     public abstract BigDecimal calculateMonthlyFee();
 
     public void transfer(BigDecimal amount, Account destinationAccount) {
-        validateAmount(amount);
-        validateBalance(amount);
-        validateActiveAccount();
-
         if (destinationAccount == null || !destinationAccount.isActive) {
             throw new IllegalArgumentException("Invalid destination account.");
         }
+
+        validateActiveAccount();
+        validateAmount(amount);
+        validateBalance(amount);
 
         BigDecimal previousBalanceOrigin = this.balance;
         BigDecimal previousBalanceDestination = destinationAccount.balance;
@@ -80,7 +80,7 @@ public abstract class Account {
     }
 
     protected void validateAmount(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("The amount must be greater than zero.");
         }
     }
@@ -105,6 +105,11 @@ public abstract class Account {
                                     Account origin,
                                     Account destination,
                                     String description) {
+
+        if ((type == TransactionType.TRANSFER_SENT || type == TransactionType.TRANSFER_RECEIVED)
+        && (origin == null || destination == null)) {
+            throw new IllegalArgumentException("Transfers must contain both origin and destination accounts.");
+        }
 
         Transaction transaction = new Transaction(type, amount, previousBalance, origin, destination, description);
         transactions.add(transaction);
