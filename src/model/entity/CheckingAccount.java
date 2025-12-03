@@ -6,9 +6,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class CheckingAccount extends Account {
-    private final BigDecimal overdraftLimit;
+    private BigDecimal overdraftLimit;
+
     private static final BigDecimal MONTHLY_FEE =
             BigDecimal.valueOf(12.0).setScale(2, RoundingMode.HALF_EVEN);
+
+    private static final BigDecimal MINIMUM_BALANCE_FOR_WAIVER = BigDecimal.valueOf(1_000)
+                                                        .setScale(2, RoundingMode.HALF_EVEN);
 
     public CheckingAccount(String agency, User holder) {
         super(agency, holder);
@@ -48,6 +52,24 @@ public class CheckingAccount extends Account {
 
     @Override
     public BigDecimal calculateMonthlyFee() {
-        return null;
+        if (this.balance.compareTo(MINIMUM_BALANCE_FOR_WAIVER) < 0) {
+            return CheckingAccount.MONTHLY_FEE;
+        }
+        return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN);
+    }
+
+    public BigDecimal getOverdraftLimit() {
+        return overdraftLimit;
+    }
+
+    public void setOverdraftLimit(BigDecimal overdraftLimit) {
+        if (this.overdraftLimit.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Overdraft limit must be greater than zero.");
+        }
+        this.overdraftLimit = overdraftLimit;
+    }
+
+    public BigDecimal getTotalAvailableBalance() {
+        return this.balance.add(this.overdraftLimit);
     }
 }
