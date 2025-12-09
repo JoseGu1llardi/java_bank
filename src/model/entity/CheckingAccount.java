@@ -46,7 +46,7 @@ public class CheckingAccount extends Account {
                 previousBalance,
                 this,
                 null,
-                description == null ? "Withdraw performed" : description
+                description == null ? "Withdraw performed." : description
         );
     }
 
