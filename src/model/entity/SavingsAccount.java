@@ -1,5 +1,8 @@
 package model.entity;
 
+import model.enums.TransactionType;
+import model.exception.InsufficientFundsException;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -32,11 +35,48 @@ public class SavingsAccount extends Account {
 
     @Override
     public void withdraw(BigDecimal amount, String description) {
+        validateAmount(amount);
+        validateActiveAccount();
 
+        BigDecimal previousBalance = getBalance();
+
+        if (amount.compareTo(this.balance) > 0) {
+            throw new InsufficientFundsException(
+                    String.format("Insufficient funds. Available %.2f", this.balance)
+            );
+        }
+
+        this.balance = balance.subtract(amount);
+
+        registerTransaction(
+                TransactionType.WITHDRAW,
+                amount,
+                previousBalance,
+                this,
+                null,
+                description == null ? "Withdraw performed." : description
+        );
     }
 
     @Override
     public BigDecimal calculateMonthlyFee() {
-        return null;
+        return BigDecimal.ZERO;
+    }
+
+    private LocalDate calculateNextAnniversary() {
+        LocalDate now = LocalDate.now();
+        int anniversaryDay = anniversaryDate.getDayOfMonth();
+
+        LocalDate candidate = LocalDate.of(
+                now.getYear(),
+                now.getMonth(),
+                Math.min(anniversaryDay, now.getMonth().length(now.isLeapYear()))
+        );
+
+        if (candidate.isBefore(now)) {
+            candidate = candidate.plusMonths(1);
+        }
+
+        return candidate;
     }
 }
