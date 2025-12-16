@@ -63,6 +63,21 @@ public class SavingsAccount extends Account {
         return BigDecimal.ZERO;
     }
 
+    /**
+     * Check if you can apply yield based on the anniversary date
+     */
+    private boolean canApplyYield() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate nextAnniversaryDate = calculateNextAnniversary();
+
+        return !currentDate.isBefore(nextAnniversaryDate) &&
+                !lastIncome.isAfter(nextAnniversaryDate.minusDays(1));
+    }
+
+    /**
+     * Calculates the next account anniversary date
+     * @return LocalDate
+     */
     private LocalDate calculateNextAnniversary() {
         LocalDate now = LocalDate.now();
         int anniversaryDay = anniversaryDate.getDayOfMonth();
