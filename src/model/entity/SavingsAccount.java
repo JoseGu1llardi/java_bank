@@ -64,7 +64,8 @@ public class SavingsAccount extends Account {
     }
 
     /**
-     * Check if you can apply yield based on the anniversary date
+     * Verifies if the current date is not before the account anniversary date
+     * and ensures the income was not already applied in the anniversary date.
      */
     private boolean canApplyYield() {
         LocalDate currentDate = LocalDate.now();
