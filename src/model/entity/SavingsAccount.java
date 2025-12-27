@@ -27,12 +27,16 @@ public class SavingsAccount extends Account {
     }
 
     private void validateRateReturn(BigDecimal fee) {
+        // Validates rate return is within allowed bounds
         if (fee.compareTo(BigDecimal.ZERO) < 0 ||
                 fee.compareTo(BigDecimal.valueOf(0.1)) > 0) {
             throw new IllegalArgumentException("Rate return must be between 0% and 10%");
         }
     }
 
+    /**
+     * Withdraws amount if an account active and has sufficient funds
+     */
     @Override
     public void withdraw(BigDecimal amount, String description) {
         validateAmount(amount);
@@ -86,13 +90,23 @@ public class SavingsAccount extends Account {
         LocalDate candidate = LocalDate.of(
                 now.getYear(),
                 now.getMonth(),
+                // ensures that the day chosen for the next birthday is never
+                // greater than the number of days in the current month.
                 Math.min(anniversaryDay, now.getMonth().length(now.isLeapYear()))
         );
 
+        // if the anniversary of this month has passed, take the next month
         if (candidate.isBefore(now)) {
             candidate = candidate.plusMonths(1);
         }
 
         return candidate;
+    }
+
+    /**
+     * Calculates the yield value
+     */
+    private BigDecimal calculateYield() {
+        return this.balance.multiply(RATE_RETURN_STANDARD);
     }
 }
