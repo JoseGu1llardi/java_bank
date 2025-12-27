@@ -5,6 +5,8 @@ import model.exception.InsufficientFundsException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 
 public class SavingsAccount extends Account {
     private static final BigDecimal RATE_RETURN_STANDARD = BigDecimal.valueOf(0.005);
@@ -108,5 +110,43 @@ public class SavingsAccount extends Account {
      */
     private BigDecimal calculateYield() {
         return this.balance.multiply(RATE_RETURN_STANDARD);
+    }
+
+
+    /**
+     * Calculate how many days are left for the next yield
+     */
+    private long daysForTheNextYield() {
+        return ChronoUnit.DAYS.between(LocalDate.now(), calculateNextAnniversary());
+    }
+
+    public BigDecimal getRateReturn() {
+        return rateReturn;
+    }
+
+    public LocalDate getAnniversaryDate() {
+        return anniversaryDate;
+    }
+
+    public LocalDate getLastIncome() {
+        return lastIncome;
+    }
+
+    /**
+     * Return the estimated value for the next yield
+     */
+    public BigDecimal getEstimatedYield() {
+        return calculateYield();
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "SavingAccount[agency=%s, number=%s, balance=$ %.2f, +" +
+                        "rateReturn=%.2f%%, nextYield=%d days]",
+                agency, number, balance,
+                rateReturn.multiply(BigDecimal.valueOf(100)),
+                daysForTheNextYield()
+        );
     }
 }
