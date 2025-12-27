@@ -1,4 +1,4 @@
-package model.enums;
+package domain.enums;
 
 public enum TransactionStatus {
     PENDING("Pending"),

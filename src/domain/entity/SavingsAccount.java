@@ -1,11 +1,10 @@
-package model.entity;
+package domain.entity;
 
-import model.enums.TransactionType;
-import model.exception.InsufficientFundsException;
+import domain.enums.TransactionType;
+import domain.exception.InsufficientFundsException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 
 public class SavingsAccount extends Account {

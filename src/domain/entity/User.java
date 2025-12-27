@@ -1,7 +1,7 @@
-package model.entity;
+package domain.entity;
 
-import model.valueObject.CPF;
-import model.valueObject.Email;
+import domain.valueObject.CPF;
+import domain.valueObject.Email;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

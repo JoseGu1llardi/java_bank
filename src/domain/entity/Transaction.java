@@ -1,7 +1,7 @@
-package model.entity;
+package domain.entity;
 
-import model.enums.TransactionStatus;
-import model.enums.TransactionType;
+import domain.enums.TransactionStatus;
+import domain.enums.TransactionType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
