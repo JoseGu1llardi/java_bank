@@ -2,6 +2,7 @@ package application.repositories;
 
 import domain.entity.User;
 import domain.valueObject.CPF;
+import domain.valueObject.Email;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,6 +34,12 @@ public class UserRepository {
     public Optional<User> findByCPF(String cpf) {
         return users.values().stream()
                 .filter(user -> user.getCpf().equals(cpf))
+                .findFirst();
+    }
+
+    public Optional<User> findByEmail(Email email) {
+        return users.values().stream()
+                .filter(user -> user.getEmail().equals(email.toString()))
                 .findFirst();
     }
 
