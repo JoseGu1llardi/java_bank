@@ -6,6 +6,8 @@ import domain.exception.EmailAlreadyInUseException;
 import domain.exception.UserNotFoundException;
 import domain.valueObject.Email;
 
+import java.util.List;
+
 /**
  * Service class for managing user-related operations.
  * This class provides methods for creating new users while ensuring data consistency.
@@ -47,6 +49,10 @@ public class UserService {
 
         user.changeEmail(validatedEmail);
         userRepository.save(user);
+    }
+
+    public List<User> getUsers() {
+        return List.copyOf(userRepository.findAll());
     }
 
 }
