@@ -2,6 +2,9 @@ package domain.valueObject;
 
 public record CPF(String value) {
 
+    /**
+     * Normalizes and validates CPF; throws on invalid input
+     */
     public CPF(String value) {
         if (value == null || value.isEmpty()) {
             throw new IllegalArgumentException("CPF must not be null or empty.");

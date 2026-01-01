@@ -30,7 +30,7 @@ public class UserRepository {
         return Optional.ofNullable(users.get(id));
     }
 
-    public Optional<User> findByCPF(CPF cpf) {
+    public Optional<User> findByCPF(String cpf) {
         return users.values().stream()
                 .filter(user -> user.getCpf().equals(cpf))
                 .findFirst();
