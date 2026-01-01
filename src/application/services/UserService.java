@@ -3,7 +3,6 @@ package application.services;
 import application.repositories.UserRepository;
 import domain.entity.User;
 import domain.exception.EmailAlreadyInUseException;
-import domain.exception.EmailUnchangedException;
 import domain.exception.UserNotFoundException;
 import domain.valueObject.Email;
 
