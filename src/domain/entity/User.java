@@ -45,13 +45,12 @@ public class User {
         return email.toString();
     }
 
-    public void changeEmail(String newEmail) {
-        Email newValue = Email.of(newEmail);
+    public void changeEmail(Email newEmail) {
 
-        if (this.email.equals(newValue)) {
+        if (this.email.equals(newEmail)) {
             throw new EmailUnchangedException("The new email is equal to the current one.");
         }
-        this.email = newValue;
+        this.email = newEmail;
     }
 
     public LocalDateTime getCreatedAt() {
