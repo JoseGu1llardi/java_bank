@@ -1,5 +1,6 @@
 package domain.entity;
 
+import domain.exception.EmailUnchangedException;
 import domain.valueObject.CPF;
 import domain.valueObject.Email;
 
@@ -36,12 +37,21 @@ public class User {
         return name;
     }
 
-    public CPF getCpf() {
-        return cpf;
+    public String getCpf() {
+        return cpf.toString();
     }
 
-    public Email getEmail() {
-        return email;
+    public String getEmail() {
+        return email.toString();
+    }
+
+    public void changeEmail(String newEmail) {
+        Email newValue = Email.of(newEmail);
+
+        if (this.email.equals(newValue)) {
+            throw new EmailUnchangedException("The new email is equal to the current one.");
+        }
+        this.email = newValue;
     }
 
     public LocalDateTime getCreatedAt() {
