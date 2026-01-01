@@ -2,7 +2,10 @@ package application.services;
 
 import application.repositories.UserRepository;
 import domain.entity.User;
+import domain.exception.EmailAlreadyInUseException;
+import domain.exception.EmailUnchangedException;
 import domain.exception.UserNotFoundException;
+import domain.valueObject.Email;
 
 /**
  * Service class for managing user-related operations.
@@ -27,6 +30,24 @@ public class UserService {
 
     public User getUserById(String id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(UserNotFoundException::new);
     }
+
+    /**
+     * Updates user email if available; persists changes
+     */
+    public void updateEmail(String userId, String newEmail) {
+        User user = this.userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Email validatedEmail = new Email(newEmail);
+
+        if (userRepository.findByEmail(validatedEmail).isPresent()) {
+            throw new EmailAlreadyInUseException("Email already in use.");
+        }
+
+        user.changeEmail(validatedEmail);
+        userRepository.save(user);
+    }
+
 }
