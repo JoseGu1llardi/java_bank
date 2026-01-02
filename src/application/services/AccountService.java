@@ -12,6 +12,11 @@ import domain.exception.UserNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Service class responsible for handling operations related to financial accounts.
+ * It provides methods for creating, retrieving, deactivating, and searching accounts
+ * associated with users.
+ */
 public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
@@ -48,11 +53,11 @@ public class AccountService {
     public void deactivateAccount(String agency, String number) {
         Account account = accountRepository.getByKey(agency, number).orElseThrow(AccountNotFoundException::new);
 
+        // Throws if an account has nonzero balance
         if (account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
             throw new IllegalArgumentException("It is not possible to deactivate account with balance.");
         } else if (account.getBalance().compareTo(BigDecimal.ZERO) < 0) {
-            throw new  IllegalArgumentException("It is not possible to deactivate account with negative balance, " +
-                    "you must pay first.");
+            throw new  IllegalArgumentException("Account cannot be deactivated with a negative balance.");
         }
 
         account.disable();
