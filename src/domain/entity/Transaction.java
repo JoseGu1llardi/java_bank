@@ -24,6 +24,9 @@ public class Transaction {
     private TransactionStatus status;
     private final String authenticationCode;
 
+    /**
+     * Creates transaction; sets amount, status, and authentication
+     */
     public Transaction(TransactionType type, BigDecimal amount,
                        BigDecimal previousBalance, Account originAccount,
                        Account destinationAccount, String description) {
@@ -131,6 +134,9 @@ public class Transaction {
         );
     }
 
+    /**
+     * Returns detailed multi‑line string representation of transaction
+     */
     public String toDetailedString() {
         return String.format(
                 """
@@ -173,5 +179,3 @@ public class Transaction {
         return Objects.hash(id, authenticationCode);
     }
 }
-
-// https://github.com/JoseGu1llardi/java_bank.git
