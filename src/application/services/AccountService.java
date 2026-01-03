@@ -43,7 +43,7 @@ public class AccountService {
     }
 
     public Account getAccount(String agency, String number) {
-        return accountRepository.getByKey(agency, number).orElseThrow(AccountNotFoundException::new);
+        return accountRepository.getByCode(agency, number).orElseThrow(AccountNotFoundException::new);
     }
 
     public List<Account> searchForUserAccounts(String userId) {
@@ -51,7 +51,7 @@ public class AccountService {
     }
 
     public void deactivateAccount(String agency, String number) {
-        Account account = accountRepository.getByKey(agency, number).orElseThrow(AccountNotFoundException::new);
+        Account account = accountRepository.getByCode(agency, number).orElseThrow(AccountNotFoundException::new);
 
         // Throws if an account has nonzero balance
         if (account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
