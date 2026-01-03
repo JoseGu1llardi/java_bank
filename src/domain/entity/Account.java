@@ -14,7 +14,6 @@ public abstract class Account {
     protected BigDecimal balance;
     protected User holder;
     protected LocalDateTime createdAt;
-    protected final List<Transaction> transactions;
     protected boolean isActive;
 
     protected static final SecureRandom random = new SecureRandom();
@@ -25,7 +24,6 @@ public abstract class Account {
         this.holder = holder;
         this.balance  = BigDecimal.ZERO;
         this.createdAt = LocalDateTime.now();
-        this.transactions = new ArrayList<>();
         this.isActive = true;
     }
 
@@ -33,23 +31,16 @@ public abstract class Account {
         validateActiveAccount();
         validateAmount(amount);
 
-        BigDecimal previousBalance = this.balance;
         this.balance = this.balance.add(amount);
-
-        registerTransaction(
-                TransactionType.DEPOSIT,
-                amount,
-                previousBalance,
-                null,
-                this,
-                description == null ? "Deposit performed." : description
-        );
     }
 
     public abstract void withdraw(BigDecimal amount, String description);
 
     public abstract BigDecimal calculateMonthlyFee();
 
+    /**
+     * Transfers amount to destination if validations pass
+     */
     public void transfer(BigDecimal amount, Account destinationAccount) {
         if (destinationAccount == null || !destinationAccount.isActive) {
             throw new IllegalArgumentException("Invalid destination account.");
@@ -59,29 +50,8 @@ public abstract class Account {
         validateAmount(amount);
         validateBalance(amount);
 
-        BigDecimal previousBalanceOrigin = this.balance;
-        BigDecimal previousBalanceDestination = destinationAccount.balance;
-
         this.balance = this.balance.subtract(amount);
         destinationAccount.balance = destinationAccount.balance.add(amount);
-
-        this.registerTransaction(
-                TransactionType.TRANSFER_SENT,
-                amount,
-                previousBalanceOrigin,
-                this,
-                destinationAccount,
-                "Transfer made to " + destinationAccount.number
-        );
-
-        destinationAccount.registerTransaction(
-                TransactionType.TRANSFER_RECEIVED,
-                amount,
-                previousBalanceDestination,
-                this,
-                destinationAccount,
-                "Transfer received from " + this.number
-        );
     }
 
     protected void validateAmount(BigDecimal amount) {
@@ -102,22 +72,6 @@ public abstract class Account {
                     "Insufficient funds. The balance must be greater than or equal to the requested amount."
             );
         }
-    }
-
-    public void registerTransaction(TransactionType type,
-                                    BigDecimal amount,
-                                    BigDecimal previousBalance,
-                                    Account origin,
-                                    Account destination,
-                                    String description ) {
-
-        if ((type == TransactionType.TRANSFER_SENT || type == TransactionType.TRANSFER_RECEIVED)
-        && (origin == null || destination == null)) {
-            throw new IllegalArgumentException("Transfers must contain both origin and destination accounts.");
-        }
-
-        Transaction transaction = new Transaction(type, amount, previousBalance, origin, destination, description);
-        transactions.add(transaction);
     }
 
     protected String generateAccountNumber() {
@@ -148,13 +102,10 @@ public abstract class Account {
         return isActive;
     }
 
-    public List<Transaction> getTransactions() {
-        return List.copyOf(transactions);
-    }
-
     public void disable() {
         this.isActive = false;
     }
+
     public void enable() {
         this.isActive = true;
     }
