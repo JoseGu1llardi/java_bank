@@ -80,6 +80,10 @@ public abstract class Account {
         return getBranchCode() + "-" + getNumber();
     }
 
+    public String getAccountCode() {
+        return accountCode;
+    }
+
     public String getNumber() {
         return number;
     }
