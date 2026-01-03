@@ -1,30 +1,28 @@
 package domain.entity;
 
-import domain.enums.TransactionType;
-
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class Account {
     protected String number;
-    protected String agency;
+    protected String branchCode;
     protected BigDecimal balance;
     protected User holder;
     protected LocalDateTime createdAt;
     protected boolean isActive;
+    protected String accountCode;
 
     protected static final SecureRandom random = new SecureRandom();
 
-    public Account(String agency, User holder) {
+    public Account(String branchCode, User holder) {
         this.number = generateAccountNumber();
-        this.agency = agency;
+        this.branchCode = branchCode;
         this.holder = holder;
         this.balance  = BigDecimal.ZERO;
         this.createdAt = LocalDateTime.now();
         this.isActive = true;
+        this.accountCode = generateAccountCode();
     }
 
     public void deposit(BigDecimal amount,  String description) {
@@ -78,12 +76,16 @@ public abstract class Account {
         return String.format("%08d", random.nextInt(100_000_000));
     }
 
+    protected String generateAccountCode() {
+        return getBranchCode() + "-" + getNumber();
+    }
+
     public String getNumber() {
         return number;
     }
 
-    public String getAgency() {
-        return agency;
+    public String getBranchCode() {
+        return branchCode;
     }
 
     public BigDecimal getBalance() {
