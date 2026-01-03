@@ -15,13 +15,13 @@ public class AccountRepository {
     }
 
     public void save(Account account) {
-        String key = account.getAgency() + "-" + account.getNumber();
-        accounts.put(key, account);
+        String accountCode = account.getAccountCode();
+        accounts.put(accountCode, account);
     }
 
-    public Optional<Account> getByKey(String agency, String number) {
-        String key = agency + "-" + number;
-        return Optional.ofNullable(accounts.get(key));
+    public Optional<Account> getByCode(String agency, String number) {
+        String accountCode = agency + "-" + number;
+        return Optional.ofNullable(accounts.get(accountCode));
     }
 
     /**
@@ -38,7 +38,7 @@ public class AccountRepository {
     }
 
     public void remove(String agency, String number) {
-        String key = agency + "-" + number;
-        accounts.remove(key);
+        String accountCode = agency + "-" + number;
+        accounts.remove(accountCode);
     }
 }
