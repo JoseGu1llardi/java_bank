@@ -1,6 +1,5 @@
 package domain.entity;
 
-import domain.enums.TransactionType;
 import domain.exception.InsufficientFundsException;
 
 import java.math.BigDecimal;
@@ -134,7 +133,7 @@ public class SavingsAccount extends Account {
         return String.format(
                 "SavingAccount[agency=%s, number=%s, balance=$ %.2f, +" +
                         "rateReturn=%.2f%%, nextYield=%d days]",
-                agency, number, balance,
+                branchCode, number, balance,
                 rateReturn.multiply(BigDecimal.valueOf(100)),
                 daysForTheNextYield()
         );
