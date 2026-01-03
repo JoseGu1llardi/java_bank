@@ -39,15 +39,6 @@ public class CheckingAccount extends Account {
         }
 
         this.balance = balance.subtract(amount);
-
-        registerTransaction(
-                TransactionType.WITHDRAW,
-                amount,
-                previousBalance,
-                this,
-                null,
-                description == null ? "Withdraw performed." : description
-        );
     }
 
     @Override
