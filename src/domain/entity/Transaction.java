@@ -18,8 +18,10 @@ public class Transaction {
     private final BigDecimal previousBalance;
     private final BigDecimal balanceAfter;
     private final LocalDateTime dateTime;
-    private final Account originAccount;
-    private final Account destinationAccount;
+
+
+    private final String originAccountCode;
+    private final String destinationAccountCode;
     private final String description;
     private TransactionStatus status;
     private final String authenticationCode;
@@ -28,16 +30,16 @@ public class Transaction {
      * Creates transaction; sets amount, status, and authentication
      */
     public Transaction(TransactionType type, BigDecimal amount,
-                       BigDecimal previousBalance, Account originAccount,
-                       Account destinationAccount, String description) {
+                       BigDecimal previousBalance, String originAccount,
+                       String destinationAccount, String description) {
         this.id = UUID.randomUUID().toString();
         this.type = type;
         this.amount = amount.setScale(2, RoundingMode.HALF_EVEN);
         this.previousBalance = previousBalance.setScale(2, RoundingMode.HALF_EVEN);
         this.balanceAfter = calculateBalanceAfter();
         this.dateTime = LocalDateTime.now();
-        this.originAccount = originAccount;
-        this.destinationAccount = destinationAccount;
+        this.originAccountCode = originAccount;
+        this.destinationAccountCode = destinationAccount;
         this.description = description;
         this.status = TransactionStatus.PENDING;
         this.authenticationCode = generateAuthenticationCode();
@@ -102,12 +104,12 @@ public class Transaction {
         return dateTime;
     }
 
-    public Account getOriginAccount() {
-        return originAccount;
+    public String getOriginAccountCode() {
+        return originAccountCode;
     }
 
-    public Account getDestinationAccount() {
-        return destinationAccount;
+    public String getDestinationAccountCode() {
+        return destinationAccountCode;
     }
 
     public String getDescription() {
@@ -159,8 +161,8 @@ public class Transaction {
                 previousBalance,
                 balanceAfter,
                 dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
-                originAccount != null ? originAccount : "N/A",
-                destinationAccount != null ? destinationAccount : "N/A",
+                originAccountCode != null ? originAccountCode : "N/A",
+                destinationAccountCode != null ? destinationAccountCode : "N/A",
                 status.getDescription(),
                 authenticationCode,
                 description
