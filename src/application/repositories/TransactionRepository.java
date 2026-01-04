@@ -97,4 +97,11 @@ public class TransactionRepository {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Count how many transactions an account has
+     */
+    public long countTransactions(String accountCode) {
+        return transactionsByAccount.getOrDefault(accountCode, Collections.emptyList()).size();
+    }
+
 }
