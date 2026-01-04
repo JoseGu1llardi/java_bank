@@ -4,7 +4,6 @@ import domain.entity.Transaction;
 import domain.enums.TransactionType;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -87,6 +86,15 @@ public class TransactionRepository {
                                 BigDecimal::add
                         )
                 ));
+    }
+
+    /**
+     * Fetch the latest N transactions
+     */
+    public List<Transaction> fetchLatest(String accountCode, long quantity) {
+        return getByAccountCode(accountCode).stream()
+                .limit(quantity)
+                .collect(Collectors.toList());
     }
 
 }
