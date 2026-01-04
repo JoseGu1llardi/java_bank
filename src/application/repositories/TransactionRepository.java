@@ -104,4 +104,11 @@ public class TransactionRepository {
         return transactionsByAccount.getOrDefault(accountCode, Collections.emptyList()).size();
     }
 
+    /**
+     * List of all transactions in the system
+     */
+    public Collection<Transaction> getAll() {
+        return transactions.values();
+    }
+
 }
