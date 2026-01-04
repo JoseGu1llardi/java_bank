@@ -2,6 +2,8 @@ package application.repositories;
 
 import domain.entity.Transaction;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +42,15 @@ public class TransactionRepository {
                 .map(transactions::get)
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(Transaction::getDateTime).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<Transaction> searchForAccountAndDate(String accountCode,
+                                                     LocalDateTime startDate, LocalDateTime endDate) {
+        // Filters account transactions by date range
+        return getByAccountCode(accountCode).stream()
+                .filter( t -> !t.getDateTime().isBefore(startDate) &&
+                        !t.getDateTime().isAfter(endDate))
                 .collect(Collectors.toList());
     }
 
