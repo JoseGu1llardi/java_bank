@@ -34,6 +34,9 @@ public class TransactionRepository {
         return Optional.ofNullable(transactions.get(id));
     }
 
+    /**
+     * Search all transaction of an account - O(n) account transactions
+     */
     public List<Transaction> getByAccountCode(String accountCode) {
         List<String> transactionsId = transactionsByAccountCode.getOrDefault(accountCode, Collections.emptyList());
 
@@ -45,6 +48,9 @@ public class TransactionRepository {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Search for transactions of an account in a specific period
+     */
     public List<Transaction> searchForAccountAndDate(String accountCode,
                                                      LocalDateTime startDate, LocalDateTime endDate) {
         // Filters account transactions by date range
