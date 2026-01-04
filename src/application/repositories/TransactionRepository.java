@@ -3,6 +3,7 @@ package application.repositories;
 import domain.entity.Transaction;
 import domain.enums.TransactionType;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -68,6 +69,24 @@ public class TransactionRepository {
         return getByAccountCode(accountCode).stream()
                 .filter( t -> t.getType().equals(type))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * The code takes all transaction from an account, separates them by type
+     * and adds up the values of each type, returning the total amount of
+     * money moved in each category
+     */
+    public Map<TransactionType, BigDecimal> calculateTotalByType(String accountCode, LocalDateTime startDate,
+                                                        LocalDateTime endDate) {
+        return searchForAccountAndDate(accountCode, startDate, endDate).stream()
+                .collect(Collectors.groupingBy(
+                        Transaction::getType,
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                Transaction::getAmount,
+                                BigDecimal::add
+                        )
+                ));
     }
 
 }
