@@ -1,6 +1,7 @@
 package application.repositories;
 
 import domain.entity.Transaction;
+import domain.enums.TransactionType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,6 +58,15 @@ public class TransactionRepository {
         return getByAccountCode(accountCode).stream()
                 .filter( t -> !t.getDateTime().isBefore(startDate) &&
                         !t.getDateTime().isAfter(endDate))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get transaction by type
+     */
+    public List<Transaction> getByType(String accountCode, TransactionType  type) {
+        return getByAccountCode(accountCode).stream()
+                .filter( t -> t.getType().equals(type))
                 .collect(Collectors.toList());
     }
 
