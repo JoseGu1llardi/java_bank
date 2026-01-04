@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 public class TransactionRepository {
     private Map<String, Transaction> transactions;
-    private Map<String, List<String>> transactionsByAccountCode;
+    private Map<String, List<String>> transactionsByAccount;
 
     public  TransactionRepository() {
         this.transactions = new HashMap<>();
-        this.transactionsByAccountCode = new HashMap<>();
+        this.transactionsByAccount = new HashMap<>();
     }
 
     /**
@@ -26,7 +26,7 @@ public class TransactionRepository {
         transactions.put(transactionId, transaction);
 
         // Update account index
-        transactionsByAccountCode.computeIfAbsent(transaction.getOriginAccountCode(),
+        transactionsByAccount.computeIfAbsent(transaction.getOriginAccountCode(),
                 k -> new ArrayList<>()).add(transactionId);
     }
 
@@ -39,7 +39,7 @@ public class TransactionRepository {
      * Search all transaction of an account - O(n) account transactions
      */
     public List<Transaction> getByAccountCode(String accountCode) {
-        List<String> transactionsId = transactionsByAccountCode.getOrDefault(accountCode, Collections.emptyList());
+        List<String> transactionsId = transactionsByAccount.getOrDefault(accountCode, Collections.emptyList());
 
         // Returns account transactions sorted by date descending
         return transactionsId.stream()
