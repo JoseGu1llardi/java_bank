@@ -1,6 +1,4 @@
-package domain.entity;
-
-import domain.enums.TransactionType;
+package domain.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
