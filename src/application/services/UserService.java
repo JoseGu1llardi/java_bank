@@ -1,7 +1,7 @@
 package application.services;
 
 import application.repositories.UserRepository;
-import domain.entity.User;
+import domain.model.User;
 import domain.exception.EmailAlreadyInUseException;
 import domain.exception.UserNotFoundException;
 import domain.valueObject.Email;
