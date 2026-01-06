@@ -2,10 +2,10 @@ package application.services;
 
 import application.repositories.AccountRepository;
 import application.repositories.UserRepository;
-import domain.entity.Account;
-import domain.entity.CheckingAccount;
-import domain.entity.SavingsAccount;
-import domain.entity.User;
+import domain.model.Account;
+import domain.model.CheckingAccount;
+import domain.model.SavingsAccount;
+import domain.model.User;
 import domain.exception.AccountNotFoundException;
 import domain.exception.UserNotFoundException;
 
@@ -42,16 +42,16 @@ public class AccountService {
         return newAccount;
     }
 
-    public Account getAccount(String agency, String number) {
-        return accountRepository.getByCode(agency, number).orElseThrow(AccountNotFoundException::new);
+    public Account getAccount(String accountCode) {
+        return accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
     }
 
     public List<Account> searchForUserAccounts(String userId) {
         return accountRepository.getByHolder(userId).stream().toList();
     }
 
-    public void deactivateAccount(String agency, String number) {
-        Account account = accountRepository.getByCode(agency, number).orElseThrow(AccountNotFoundException::new);
+    public void deactivateAccount(String accountCode) {
+        Account account = accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
 
         // Throws if an account has nonzero balance
         if (account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
