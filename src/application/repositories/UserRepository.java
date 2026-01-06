@@ -1,7 +1,6 @@
 package application.repositories;
 
-import domain.entity.User;
-import domain.valueObject.CPF;
+import domain.model.User;
 import domain.valueObject.Email;
 
 import java.util.Collection;
