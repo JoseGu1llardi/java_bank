@@ -1,6 +1,6 @@
 package application.repositories;
 
-import domain.entity.Account;
+import domain.model.Account;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,8 +19,7 @@ public class AccountRepository {
         accounts.put(accountCode, account);
     }
 
-    public Optional<Account> getByCode(String agency, String number) {
-        String accountCode = agency + "-" + number;
+    public Optional<Account> getByCode(String accountCode) {
         return Optional.ofNullable(accounts.get(accountCode));
     }
 
