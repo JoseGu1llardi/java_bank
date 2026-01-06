@@ -1,4 +1,4 @@
-package domain.entity;
+package domain.model;
 
 import domain.enums.TransactionStatus;
 import domain.enums.TransactionType;
@@ -30,7 +30,7 @@ public class Transaction {
      * Creates transaction; sets amount, status, and authentication
      */
     public Transaction(TransactionType type, BigDecimal amount,
-                       BigDecimal previousBalance, String originAccount,
+                       BigDecimal previousBalance, String originAccountCode,
                        String destinationAccount, String description) {
         this.id = UUID.randomUUID().toString();
         this.type = type;
@@ -38,9 +38,9 @@ public class Transaction {
         this.previousBalance = previousBalance.setScale(2, RoundingMode.HALF_EVEN);
         this.balanceAfter = calculateBalanceAfter();
         this.dateTime = LocalDateTime.now();
-        this.originAccountCode = originAccount;
+        this.originAccountCode = originAccountCode;
         this.destinationAccountCode = destinationAccount;
-        this.description = description;
+        this.description = description != null ? description : "Deposit made.";
         this.status = TransactionStatus.PENDING;
         this.authenticationCode = generateAuthenticationCode();
     }
