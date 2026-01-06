@@ -1,6 +1,6 @@
 package application.repositories;
 
-import domain.entity.Transaction;
+import domain.model.Transaction;
 import domain.enums.TransactionType;
 
 import java.math.BigDecimal;
