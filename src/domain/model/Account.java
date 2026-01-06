@@ -1,4 +1,4 @@
-package domain.entity;
+package domain.model;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -25,7 +25,7 @@ public abstract class Account {
         this.accountCode = generateAccountCode();
     }
 
-    public void deposit(BigDecimal amount,  String description) {
+    public void deposit(BigDecimal amount) {
         validateActiveAccount();
         validateAmount(amount);
 
