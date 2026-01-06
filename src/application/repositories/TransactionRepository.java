@@ -71,7 +71,7 @@ public class TransactionRepository {
     }
 
     /**
-     * The code takes all transaction from an account, separates them by type
+     * The code takes all transactions from an account, separates them by type,
      * and adds up the values of each type, returning the total amount of
      * money moved in each category
      */
