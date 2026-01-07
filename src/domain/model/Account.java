@@ -32,7 +32,7 @@ public abstract class Account {
         this.balance = this.balance.add(amount);
     }
 
-    public abstract void withdraw(BigDecimal amount, String description);
+    public abstract void withdraw(BigDecimal amount);
 
     public abstract BigDecimal calculateMonthlyFee();
 
