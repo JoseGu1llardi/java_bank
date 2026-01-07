@@ -61,4 +61,44 @@ public class Transactionservice {
         transactionRepository.save(transaction);
         accountRepository.save(account);
     }
+
+    /**
+     * Transfers funds between accounts; persists origin transaction
+     */
+    public void transfer(String originAccountCode, String destinationAccountCode, BigDecimal amount) {
+        Account originAccount = accountRepository.getByCode(originAccountCode).
+                orElseThrow(AccountNotFoundException::new);
+
+        Account destinationAccount = accountRepository.getByCode(destinationAccountCode)
+                .orElseThrow(AccountNotFoundException::new);
+
+        BigDecimal originPreviousBalance = originAccount.getBalance();
+        BigDecimal destinationPreviousBalance = destinationAccount.getBalance();
+
+        originAccount.transfer(destinationAccount, amount);
+
+        Transaction sentTransaction = new Transaction(
+                TransactionType.TRANSFER_SENT,
+                amount,
+                originPreviousBalance,
+                originAccountCode,
+                destinationAccountCode,
+                "Transfer sent"
+        );
+
+        Transaction receivedTransaction = new Transaction(
+                TransactionType.TRANSFER_RECEIVED,
+                amount,
+                destinationPreviousBalance,
+                originAccountCode,
+                destinationAccountCode,
+                "Transfer received"
+        );
+
+        transactionRepository.save(sentTransaction);
+        transactionRepository.save(receivedTransaction);
+
+        accountRepository.save(originAccount);
+        accountRepository.save(destinationAccount);
+    }
 }
