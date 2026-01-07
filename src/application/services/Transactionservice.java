@@ -28,10 +28,34 @@ public class Transactionservice {
         // Register the transaction in the separate repository
         Transaction transaction = new Transaction(
                 TransactionType.DEPOSIT,
-                amount,previousBalance,
+                amount,
+                previousBalance,
+                null,
+                accountCode,
+                "Deposit"
+        );
+
+        transactionRepository.save(transaction);
+        accountRepository.save(account);
+    }
+
+    /**
+     * Implements withdrawal; persists transactional state
+     */
+    public void withdraw(String accountCode, BigDecimal amount) {
+        Account account = accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
+
+        BigDecimal previousBalance = account.getBalance();
+
+        account.withdraw(amount);
+
+        Transaction transaction = new Transaction(
+                TransactionType.WITHDRAW,
+                amount,
+                previousBalance,
                 accountCode,
                 null,
-                ""
+                "Withdraw"
         );
 
         transactionRepository.save(transaction);
