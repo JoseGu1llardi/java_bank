@@ -26,7 +26,7 @@ public class CheckingAccount extends Account {
      * Withdraws amount if funds are enough
      */
     @Override
-    public void withdraw(BigDecimal amount, String description) {
+    public void withdraw(BigDecimal amount) {
         super.validateAmount(amount);
         super.validateActiveAccount();
 
