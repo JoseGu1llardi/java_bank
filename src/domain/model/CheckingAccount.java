@@ -22,6 +22,9 @@ public class CheckingAccount extends Account {
         this.overdraftLimit = overdraftLimit;
     }
 
+    /**
+     * Withdraws amount if funds are enough
+     */
     @Override
     public void withdraw(BigDecimal amount, String description) {
         super.validateAmount(amount);
