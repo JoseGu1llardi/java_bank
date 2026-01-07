@@ -38,7 +38,7 @@ public class SavingsAccount extends Account {
      * Withdraws amount if an account active and has sufficient funds
      */
     @Override
-    public void withdraw(BigDecimal amount, String description) {
+    public void withdraw(BigDecimal amount) {
         validateAmount(amount);
         validateActiveAccount();
 

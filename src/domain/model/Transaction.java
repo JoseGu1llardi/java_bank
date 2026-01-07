@@ -19,7 +19,6 @@ public class Transaction {
     private final BigDecimal balanceAfter;
     private final LocalDateTime dateTime;
 
-
     private final String originAccountCode;
     private final String destinationAccountCode;
     private final String description;
@@ -40,7 +39,7 @@ public class Transaction {
         this.dateTime = LocalDateTime.now();
         this.originAccountCode = originAccountCode;
         this.destinationAccountCode = destinationAccount;
-        this.description = description != null ? description : "Deposit made.";
+        this.description = description != null ? description : "Transaction made.";
         this.status = TransactionStatus.PENDING;
         this.authenticationCode = generateAuthenticationCode();
     }
@@ -50,7 +49,7 @@ public class Transaction {
             case DEPOSIT, TRANSFER_RECEIVED -> this.previousBalance.add(this.amount);
             case WITHDRAW, TRANSFER_SENT, BILL_PAYMENT, PIX_PAYMENT, TED, DOC, FEE ->
                 previousBalance.subtract(this.amount);
-            default -> previousBalance;
+            default -> this.previousBalance;
         };
     }
 
