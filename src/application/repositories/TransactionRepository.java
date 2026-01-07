@@ -4,6 +4,7 @@ import domain.model.Transaction;
 import domain.enums.TransactionType;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,7 +54,7 @@ public class TransactionRepository {
      * Search for transactions of an account in a specific period
      */
     public List<Transaction> searchForAccountAndDate(String accountCode,
-                                                     LocalDateTime startDate, LocalDateTime endDate) {
+                                                     LocalDate startDate, LocalDate endDate) {
         // Filters account transactions by date range
         return getByAccountCode(accountCode).stream()
                 .filter( t -> !t.getDateTime().isBefore(startDate) &&
@@ -75,8 +76,8 @@ public class TransactionRepository {
      * and adds up the values of each type, returning the total amount of
      * money moved in each category
      */
-    public Map<TransactionType, BigDecimal> calculateTotalByType(String accountCode, LocalDateTime startDate,
-                                                        LocalDateTime endDate) {
+    public Map<TransactionType, BigDecimal> calculateTotalByType(String accountCode, LocalDate startDate,
+                                                        LocalDate endDate) {
         return searchForAccountAndDate(accountCode, startDate, endDate).stream()
                 .collect(Collectors.groupingBy(
                         Transaction::getType,
