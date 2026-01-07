@@ -39,7 +39,7 @@ public abstract class Account {
     /**
      * Transfers amount to destination if validations pass
      */
-    public void transfer(BigDecimal amount, Account destinationAccount) {
+    public void transfer(Account destinationAccount, BigDecimal amount) {
         if (destinationAccount == null || !destinationAccount.isActive) {
             throw new IllegalArgumentException("Invalid destination account.");
         }
