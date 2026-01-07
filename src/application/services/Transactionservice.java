@@ -8,6 +8,9 @@ import domain.model.Account;
 import domain.model.Transaction;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class Transactionservice {
     private final AccountRepository accountRepository;
@@ -100,5 +103,27 @@ public class Transactionservice {
 
         accountRepository.save(originAccount);
         accountRepository.save(destinationAccount);
+    }
+
+
+    /**
+     * Gets complete transaction history for an account
+     */
+    public List<Transaction> getStatement(String accountCode) {
+        return transactionRepository.getByAccountCode(accountCode);
+    }
+
+    /**
+     * Gets transaction history for a specific period
+     */
+    public List<Transaction> getStatement(String accountCode, LocalDate startDateTime, LocalDate endDateTime) {
+        return transactionRepository.searchForAccountAndDate(accountCode, startDateTime, endDateTime);
+    }
+
+    /**
+     * Gets the most recent N transaction
+     */
+    public List<Transaction> getRecentStatement(String accountCode, int limit) {
+        return transactionRepository.fetchLatest(accountCode, limit);
     }
 }
