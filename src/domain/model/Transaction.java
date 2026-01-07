@@ -5,6 +5,7 @@ import domain.enums.TransactionType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -17,7 +18,7 @@ public class Transaction {
     private final BigDecimal amount;
     private final BigDecimal previousBalance;
     private final BigDecimal balanceAfter;
-    private final LocalDateTime dateTime;
+    private final LocalDate dateTime;
 
     private final String originAccountCode;
     private final String destinationAccountCode;
@@ -36,7 +37,7 @@ public class Transaction {
         this.amount = amount.setScale(2, RoundingMode.HALF_EVEN);
         this.previousBalance = previousBalance.setScale(2, RoundingMode.HALF_EVEN);
         this.balanceAfter = calculateBalanceAfter();
-        this.dateTime = LocalDateTime.now();
+        this.dateTime = LocalDate.now();
         this.originAccountCode = originAccountCode;
         this.destinationAccountCode = destinationAccount;
         this.description = description != null ? description : "Transaction made.";
@@ -99,7 +100,7 @@ public class Transaction {
         return balanceAfter;
     }
 
-    public LocalDateTime getDateTime() {
+    public LocalDate getDateTime() {
         return dateTime;
     }
 
