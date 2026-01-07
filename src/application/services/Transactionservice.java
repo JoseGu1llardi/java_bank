@@ -9,7 +9,6 @@ import domain.model.Transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class Transactionservice {
@@ -21,6 +20,10 @@ public class Transactionservice {
         this.transactionRepository = transactionRepository;
     }
 
+    /**
+     * Deposits a specified amount into the account identified by the given account code.
+     * Updates the account balance and records the transaction.
+     */
     public void deposit(String accountCode, BigDecimal amount) {
         Account account = accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
 
