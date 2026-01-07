@@ -26,30 +26,49 @@ public class AccountService {
         this.userRepository = userRepository;
     }
 
-    public Account createCheckingAccount(String agency, String userId) {
+    /**
+     * Creates a new checking account for a user with the given branch and user ID.
+     */
+    public Account createCheckingAccount(String branch, String userId) {
         User holder = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        Account newAccount = new CheckingAccount(agency, holder);
+        Account newAccount = new CheckingAccount(branch, holder);
         accountRepository.save(newAccount);
         return newAccount;
     }
 
-    public Account createSavingAccount(String agency, String userId) {
+    /**
+     * Creates a new savings account for a user with the specified branch and user ID.
+     * The method ensures that the user exists before creating the account.
+     */
+    public Account createSavingAccount(String branch, String userId) {
         User holder = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        Account newAccount =  new SavingsAccount(agency, holder);
+        Account newAccount =  new SavingsAccount(branch, holder);
         accountRepository.save(newAccount);
         return newAccount;
     }
 
+    /**
+     * Retrieves an account based on its unique account code.
+     * If the account is not found, an AccountNotFoundException is thrown.
+     */
     public Account getAccount(String accountCode) {
         return accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
     }
 
+    /**
+     * Searches for and retrieves a list of user accounts associated with the specified user ID.
+     */
     public List<Account> searchForUserAccounts(String userId) {
         return accountRepository.getByHolder(userId).stream().toList();
     }
 
+    /**
+     * Deactivates an account associated with the provided account code.
+     * The account must have a zero balance to be deactivated. If the account balance is
+     * greater than or less than zero, an exception will be thrown.
+     */
     public void deactivateAccount(String accountCode) {
         Account account = accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
 
