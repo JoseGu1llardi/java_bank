@@ -12,13 +12,13 @@ public class CheckingAccount extends Account {
     private static final BigDecimal MINIMUM_BALANCE_FOR_WAIVER = BigDecimal.valueOf(1_000)
                                                         .setScale(2, RoundingMode.HALF_EVEN);
 
-    public CheckingAccount(String agency, User holder) {
-        super(agency, holder);
+    public CheckingAccount(String branch, User holder) {
+        super(branch, holder);
         this.overdraftLimit = BigDecimal.valueOf(500.0).setScale(2, RoundingMode.HALF_EVEN);
     }
 
-    public CheckingAccount(String agency, User holder, BigDecimal overdraftLimit) {
-        super(agency, holder);
+    public CheckingAccount(String branch, User holder, BigDecimal overdraftLimit) {
+        super(branch, holder);
         this.overdraftLimit = overdraftLimit;
     }
 
@@ -30,7 +30,6 @@ public class CheckingAccount extends Account {
         super.validateAmount(amount);
         super.validateActiveAccount();
 
-        BigDecimal previousBalance = this.balance;
         BigDecimal totalAvailable = this.balance.add(overdraftLimit);
 
         if (amount.compareTo(totalAvailable) > 0) {
