@@ -10,6 +10,7 @@ import domain.model.Transaction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public class Transactionservice {
     private final AccountRepository accountRepository;
@@ -108,7 +109,6 @@ public class Transactionservice {
         accountRepository.save(destinationAccount);
     }
 
-
     /**
      * Gets complete transaction history for an account
      */
@@ -120,7 +120,7 @@ public class Transactionservice {
      * Gets transaction history for a specific period
      */
     public List<Transaction> getStatement(String accountCode, LocalDate startDateTime, LocalDate endDateTime) {
-        return transactionRepository.searchForAccountAndDate(accountCode, startDateTime, endDateTime);
+        return transactionRepository.findByAccountCodeAndDateBetween(accountCode, startDateTime, endDateTime);
     }
 
     /**
@@ -128,5 +128,28 @@ public class Transactionservice {
      */
     public List<Transaction> getRecentStatement(String accountCode, int limit) {
         return transactionRepository.fetchLatest(accountCode, limit);
+    }
+
+    /**
+     * Retrieves expenses grouped by transaction type for a specific account.
+     * Verifies its existence and calculates the total expenses for each transaction type.
+     */
+    public Map<TransactionType, BigDecimal> getStatementExpensesByType(String accountCode) {
+        Account account = accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
+
+        return transactionRepository.calculateTotalByType(accountCode);
+    }
+
+    /**
+     * Retrieves the total expenses grouped by transaction type for a specific account
+     * within a given date range and calculates the total expenses for each transaction
+     * type during the specified period.
+     */
+    public Map<TransactionType, BigDecimal> getStatementExpensesByTypeAndDate(String accountCode,
+                                                                              LocalDate startDate,
+                                                                              LocalDate endDate) {
+        Account account = accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
+
+        return transactionRepository.calculateTotalByType(accountCode, startDate,  endDate);
     }
 }
