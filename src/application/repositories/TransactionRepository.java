@@ -53,7 +53,7 @@ public class TransactionRepository {
     /**
      * Search for transactions of an account in a specific period
      */
-    public List<Transaction> searchForAccountAndDate(String accountCode,
+    public List<Transaction> findByAccountCodeAndDateBetween(String accountCode,
                                                      LocalDate startDate, LocalDate endDate) {
         // Filters account transactions by date range
         return getByAccountCode(accountCode).stream()
@@ -65,10 +65,26 @@ public class TransactionRepository {
     /**
      * Get transaction by type
      */
-    public List<Transaction> getByType(String accountCode, TransactionType  type) {
+    public List<Transaction> getByType(String accountCode, TransactionType type) {
         return getByAccountCode(accountCode).stream()
                 .filter( t -> t.getType().equals(type))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * This method retrieves all transactions associated with the specified account code,
+     * groups them by their transaction type, and sums up the amounts for each type.
+     */
+    public Map<TransactionType, BigDecimal> calculateTotalByType(String accountCode) {
+        return getByAccountCode(accountCode).stream()
+                .collect(Collectors.groupingBy(
+                        Transaction::getType,
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                Transaction::getAmount,
+                                BigDecimal::add
+                        )
+                ));
     }
 
     /**
@@ -78,7 +94,7 @@ public class TransactionRepository {
      */
     public Map<TransactionType, BigDecimal> calculateTotalByType(String accountCode, LocalDate startDate,
                                                         LocalDate endDate) {
-        return searchForAccountAndDate(accountCode, startDate, endDate).stream()
+        return findByAccountCodeAndDateBetween(accountCode, startDate, endDate).stream()
                 .collect(Collectors.groupingBy(
                         Transaction::getType,
                         Collectors.reducing(
