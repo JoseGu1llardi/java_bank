@@ -1,7 +1,9 @@
 package application.repositories;
 
 import domain.model.Account;
+import domain.model.SavingsAccount;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

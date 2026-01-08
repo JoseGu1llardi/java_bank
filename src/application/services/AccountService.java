@@ -11,6 +11,7 @@ import domain.exception.UserNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class responsible for handling operations related to financial accounts.
