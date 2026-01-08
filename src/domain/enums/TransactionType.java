@@ -11,7 +11,8 @@ public enum TransactionType {
     DOC("Doc"),
     REVERSAL("Reversal"),
     INTEREST("Interest"),
-    FEE("Fee");
+    FEE("Fee"),
+    YIELD("Yield"),;
 
     private final String value;
 
