@@ -5,6 +5,7 @@ import domain.exception.InsufficientFundsException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 public class SavingsAccount extends Account {
     private static final BigDecimal RATE_RETURN_STANDARD = BigDecimal.valueOf(0.005);
@@ -42,8 +43,6 @@ public class SavingsAccount extends Account {
         validateAmount(amount);
         validateActiveAccount();
 
-        BigDecimal previousBalance = getBalance();
-
         if (amount.compareTo(this.balance) > 0) {
             throw new InsufficientFundsException(
                     String.format("Insufficient funds. Available %.2f", this.balance)
@@ -51,6 +50,21 @@ public class SavingsAccount extends Account {
         }
 
         this.balance = balance.subtract(amount);
+    }
+
+    /**
+     * Optionally applies yield; updates balance and last income
+     */
+    public Optional<BigDecimal> applyYield() {
+        if (!canApplyYield()) {
+            return Optional.empty();
+        }
+
+        BigDecimal yieldAmount = calculateYield();
+        this.balance = balance.add(yieldAmount);
+        this.lastIncome = LocalDate.now();
+
+        return Optional.of(yieldAmount);
     }
 
     @Override
@@ -100,7 +114,6 @@ public class SavingsAccount extends Account {
     private BigDecimal calculateYield() {
         return this.balance.multiply(RATE_RETURN_STANDARD);
     }
-
 
     /**
      * Calculate how many days are left for the next yield
