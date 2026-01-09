@@ -22,6 +22,7 @@ public class JavaBank {
         AccountService accountService = new AccountService(accountRepository, userRepository);
         Transactionservice transactionservice = new Transactionservice(accountRepository, transactionRepository);
 
+        // Executes banking system simulation; handles exceptions
         try {
             System.out.println("========== BANKING SYSTEM ==========");
 
