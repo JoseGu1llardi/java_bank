@@ -4,7 +4,7 @@ import application.repositories.UserRepository;
 import domain.model.User;
 import domain.exception.EmailAlreadyInUseException;
 import domain.exception.UserNotFoundException;
-import domain.valueObject.Email;
+import domain.vo.Email;
 
 import java.util.List;
 

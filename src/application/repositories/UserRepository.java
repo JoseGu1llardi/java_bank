@@ -1,7 +1,7 @@
 package application.repositories;
 
 import domain.model.User;
-import domain.valueObject.Email;
+import domain.vo.Email;
 
 import java.util.Collection;
 import java.util.HashMap;
