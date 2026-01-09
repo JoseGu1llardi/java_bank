@@ -40,8 +40,8 @@ public class Transactionservice {
                 TransactionType.DEPOSIT,
                 amount,
                 previousBalance,
-                null,
                 accountCode,
+                null,
                 "Deposit"
         );
 
