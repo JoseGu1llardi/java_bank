@@ -5,12 +5,14 @@ import application.repositories.TransactionRepository;
 import domain.enums.TransactionType;
 import domain.exception.AccountNotFoundException;
 import domain.model.Account;
+import domain.model.SavingsAccount;
 import domain.model.Transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Transactionservice {
     private final AccountRepository accountRepository;
@@ -107,6 +109,39 @@ public class Transactionservice {
 
         accountRepository.save(originAccount);
         accountRepository.save(destinationAccount);
+    }
+
+    /**
+     * Applies the yield to a savings account identified by the given account code.
+     * It retrieves the account, verifies that it is a savings account, calculates
+     * the yield, and persists the resulting transaction and account changes.
+     */
+    public void applyYield(String accountCode) {
+        Account account = accountRepository.getByCode(accountCode)
+                .orElseThrow(AccountNotFoundException::new);
+
+        if (!(account instanceof SavingsAccount savingsAccount)) {
+            throw new IllegalArgumentException("Only savings account can receive yield");
+        }
+
+        Optional<BigDecimal> yieldAmount = savingsAccount.applyYield();
+
+        // Persists yield transaction and updates an account
+        if (yieldAmount.isPresent()) {
+            BigDecimal previousBalance = account.getBalance().subtract(yieldAmount.get());
+
+            Transaction transaction = new Transaction(
+                    TransactionType.YIELD,
+                    yieldAmount.get(),
+                    previousBalance,
+                    accountCode,
+                    null,
+                    "Yield applied"
+            );
+
+            transactionRepository.save(transaction);
+            accountRepository.save(savingsAccount);
+        }
     }
 
     /**
