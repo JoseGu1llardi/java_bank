@@ -77,7 +77,7 @@ public abstract class Account {
     }
 
     protected String generateAccountCode() {
-        return getBranchCode() + "-" + getNumber();
+        return getBranchCode() + getNumber();
     }
 
     public String getAccountCode() {

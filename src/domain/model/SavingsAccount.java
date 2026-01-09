@@ -14,8 +14,8 @@ public class SavingsAccount extends Account {
     private final LocalDate anniversaryDate;
     private LocalDate lastIncome;
 
-    public SavingsAccount(String agency, User holder) {
-        super(agency, holder);
+    public SavingsAccount(String branch, User holder) {
+        super(branch, holder);
         this.anniversaryDate = LocalDate.now();
     }
 
