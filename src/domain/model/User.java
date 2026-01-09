@@ -10,9 +10,9 @@ import java.util.UUID;
 public class User {
     private final String id;
     private String name;
-    private CPF cpf;
+    private final CPF cpf;
     private Email email;
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     public User(String name, String cpf, String email) {
         this.id = UUID.randomUUID().toString();
