@@ -131,7 +131,7 @@ public class Transaction {
                 id.substring(0, 8), // shows only part of the ID
                 type.getDescription(),
                 amount,
-                dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
+                dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                 status.getDescription()
         );
     }
