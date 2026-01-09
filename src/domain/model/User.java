@@ -1,8 +1,8 @@
 package domain.model;
 
 import domain.exception.EmailUnchangedException;
-import domain.valueObject.CPF;
-import domain.valueObject.Email;
+import domain.vo.CPF;
+import domain.vo.Email;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -55,5 +55,16 @@ public class User {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", cpf=" + cpf +
+                ", email=" + email +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
