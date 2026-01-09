@@ -5,6 +5,7 @@ import application.repositories.TransactionRepository;
 import domain.enums.TransactionType;
 import domain.exception.AccountNotFoundException;
 import domain.model.Account;
+import domain.model.CheckingAccount;
 import domain.model.SavingsAccount;
 import domain.model.Transaction;
 
@@ -109,6 +110,34 @@ public class Transactionservice {
 
         accountRepository.save(originAccount);
         accountRepository.save(destinationAccount);
+    }
+
+    /**
+     * Charges fee to a checking account; persists transaction
+     */
+    public void chargeFee(String accountCode) {
+        Account account = accountRepository.getByCode(accountCode)
+                .orElseThrow(AccountNotFoundException::new);
+
+        if (!(account instanceof CheckingAccount checkingAccount)) {
+            throw new IllegalArgumentException("Only checking account can be charged");
+        }
+
+        BigDecimal previousBalance = checkingAccount.getBalance();
+        Optional<BigDecimal> feeAmount = checkingAccount.applyFee();
+
+        if (feeAmount.isPresent()) {
+            Transaction transaction = new Transaction(
+                    TransactionType.FEE,
+                    feeAmount.get(),
+                    previousBalance,
+                    accountCode,
+                    null,
+                    "Monthly maintenance fee"
+            );
+            transactionRepository.save(transaction);
+            accountRepository.save(checkingAccount);
+        }
     }
 
     /**
