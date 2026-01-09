@@ -1,4 +1,4 @@
-package domain.valueObject;
+package domain.vo;
 
 import java.util.regex.Pattern;
 

@@ -1,4 +1,4 @@
-package domain.valueObject;
+package domain.vo;
 
 public record CPF(String value) {
 
