@@ -170,7 +170,7 @@ public class Transactionservice {
      * Verifies its existence and calculates the total expenses for each transaction type.
      */
     public Map<TransactionType, BigDecimal> getStatementExpensesByType(String accountCode) {
-        Account account = accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
+        accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
 
         return transactionRepository.calculateTotalByType(accountCode);
     }
@@ -183,7 +183,7 @@ public class Transactionservice {
     public Map<TransactionType, BigDecimal> getStatementExpensesByTypeAndDate(String accountCode,
                                                                               LocalDate startDate,
                                                                               LocalDate endDate) {
-        Account account = accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
+        accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
 
         return transactionRepository.calculateTotalByType(accountCode, startDate,  endDate);
     }
