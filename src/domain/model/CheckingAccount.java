@@ -2,6 +2,7 @@ package domain.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 public class CheckingAccount extends Account {
     private BigDecimal overdraftLimit;
@@ -39,6 +40,20 @@ public class CheckingAccount extends Account {
         }
 
         this.balance = balance.subtract(amount);
+    }
+
+    /**
+     * Applies monthly fee, if any, to account balance
+     */
+    public Optional<BigDecimal> applyFee() {
+        BigDecimal feeAmount = this.calculateMonthlyFee();
+
+        if (feeAmount.compareTo(BigDecimal.ZERO) == 0) {
+            return Optional.empty();
+        }
+
+        this.balance = balance.subtract(feeAmount);
+        return Optional.of(feeAmount);
     }
 
     @Override
