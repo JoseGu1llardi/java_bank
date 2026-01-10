@@ -143,12 +143,17 @@ public class SavingsAccount extends Account {
 
     @Override
     public String toString() {
-        return String.format(
-                "SavingAccount[agency=%s, number=%s, balance=$ %.2f, +" +
-                        "rateReturn=%.2f%%, nextYield=%d days]",
-                branchCode, number, balance,
-                rateReturn.multiply(BigDecimal.valueOf(100)),
-                daysForTheNextYield()
-        );
+        return "SavingsAccount{" +
+                "rateReturn=" + rateReturn +
+                ", anniversaryDate=" + anniversaryDate +
+                ", lastIncome=" + lastIncome +
+                ", accountCode='" + accountCode + '\'' +
+                ", isActive=" + isActive +
+                ", createdAt=" + createdAt +
+                ", holder=" + holder +
+                ", balance=" + balance +
+                ", branchCode='" + branchCode + '\'' +
+                ", number='" + number + '\'' +
+                "} " + super.toString();
     }
 }
