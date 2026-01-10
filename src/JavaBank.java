@@ -27,19 +27,27 @@ public class JavaBank {
             System.out.println("========== BANKING SYSTEM ==========");
 
             System.out.println("CREATING USERS...");
-            User jose = new User("Jose Guillard", "438-900-898-60", "junior11_junior@hotmail.com");
-            User leticia = new User("Leticia Castro Martins Silva", "000-000-000-10", "leticiacms11@hotmail.com");
+            User jose = new User(
+                    "Jose Guillard",
+                    "438-900-898-60",
+                    "junior11_junior@hotmail.com"
+            );
+            User elisa = new User(
+                    "Elisa Pontes",
+                    "000-000-000-10",
+                    "elisa.pontes@hotmail.com"
+            );
 
             userRepository.save(jose);
-            userRepository.save(leticia);
+            userRepository.save(elisa);
 
-            System.out.println("Users created successfully: " + jose.getName() + ", " + leticia.getName());
+            System.out.println("Users created successfully: " + jose.getName() + ", " + elisa.getName());
             System.out.println();
 
             System.out.println("CREATING ACCOUNTS...");
             CheckingAccount joseCheckingAccount = new CheckingAccount("0001", jose);
             SavingsAccount joseSavingsAccount = new SavingsAccount("0001", jose);
-            CheckingAccount leticiaCheckingAccount = new CheckingAccount("0001", leticia);
+            CheckingAccount leticiaCheckingAccount = new CheckingAccount("0001", elisa);
 
             accountRepository.save(joseCheckingAccount);
             accountRepository.save(joseSavingsAccount);
