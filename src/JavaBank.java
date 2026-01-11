@@ -34,16 +34,16 @@ public class JavaBank {
                     "438-900-898-60",
                     "junior11_junior@hotmail.com"
             );
-            User elisa = new User(
-                    "Elisa Pontes",
+            User leticia = new User(
+                    "Leticia Castro",
                     "000-000-000-10",
-                    "elisa.pontes@hotmail.com"
+                    "leticiacms11@hotmail.com"
             );
 
             userRepository.save(jose);
-            userRepository.save(elisa);
+            userRepository.save(leticia);
 
-            System.out.println("Users created successfully: " + jose.getName() + ", " + elisa.getName());
+            System.out.println("Users created successfully: " + jose.getName() + ", " + leticia.getName());
             System.out.println();
 
 
@@ -53,7 +53,7 @@ public class JavaBank {
             // Both variables are of the abstract type Account
             CheckingAccount joseCheckingAccount = new CheckingAccount("0001", jose);
             SavingsAccount joseSavingsAccount = new SavingsAccount("0001", jose);
-            CheckingAccount leticiaCheckingAccount = new CheckingAccount("0001", elisa);
+            CheckingAccount leticiaCheckingAccount = new CheckingAccount("0001", leticia);
 
             accountRepository.save(joseCheckingAccount);
             accountRepository.save(joseSavingsAccount);
@@ -80,7 +80,7 @@ public class JavaBank {
 
             // Withdraw from Checking Account - Can use overdraft
             System.out.println("Trying withdraw $1.800 from the checking account (balance: $1.500)");
-            transactionservice.withdraw(joseCheckingAccount.getAccountCode(), BigDecimal.valueOf(1800));
+            // transactionservice.withdraw(joseCheckingAccount.getAccountCode(), BigDecimal.valueOf(1800));
             System.out.println("Withdraw approved! New balance: " + joseCheckingAccount.getBalance());
             System.out.println("(Using $300 from the overdraft)");
             System.out.println();
@@ -94,6 +94,33 @@ public class JavaBank {
             }
             System.out.println();
 
+            System.out.println("PERFORMING TRANSFER...");
+            System.out.println();
+
+            BigDecimal joseCheckingBalance = joseCheckingAccount.getBalance();
+            System.out.println("Jose's Checking Account before: " + joseCheckingBalance);
+
+            BigDecimal elisaBalance = leticiaCheckingAccount.getBalance();
+            System.out.println("Elisa's balance before: " + elisaBalance);
+
+            transactionservice.transfer(
+                    joseCheckingAccount.getAccountCode(),
+                    leticiaCheckingAccount.getAccountCode(),
+                    BigDecimal.valueOf(500)
+            );
+
+            System.out.println();
+
+            BigDecimal joseBalanceAfter = joseCheckingAccount.getBalance();
+            System.out.println("Jose's Balance after: " + joseBalanceAfter);
+
+            BigDecimal elisaBalanceAfter = leticiaCheckingAccount.getBalance();
+            System.out.println("Elisa's Balance after: " + elisaBalanceAfter);
+            System.out.println();
+
+            // Shows if the transfers were carried out successfully for their due accounts
+            System.out.println(transactionservice.getStatement(joseCheckingAccount.getAccountCode()));
+            System.out.println(transactionservice.getStatement(leticiaCheckingAccount.getAccountCode()));
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
