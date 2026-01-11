@@ -20,8 +20,8 @@ public class Transaction {
     private final BigDecimal balanceAfter;
     private final LocalDate dateTime;
 
-    private final String originAccountCode;
-    private final String destinationAccountCode;
+    private final String accountOwnerCode;
+    private final String counterpartyAccountCode;
     private final String description;
     private TransactionStatus status;
     private final String authenticationCode;
@@ -30,16 +30,16 @@ public class Transaction {
      * Creates transaction; sets amount, status, and authentication
      */
     public Transaction(TransactionType type, BigDecimal amount,
-                       BigDecimal previousBalance, String originAccountCode,
-                       String destinationAccount, String description) {
+                       BigDecimal previousBalance, String accountOwnerCode,
+                       String counterpartyAccountCode, String description) {
         this.id = UUID.randomUUID().toString();
         this.type = type;
         this.amount = amount.setScale(2, RoundingMode.HALF_EVEN);
         this.previousBalance = previousBalance.setScale(2, RoundingMode.HALF_EVEN);
         this.balanceAfter = calculateBalanceAfter();
         this.dateTime = LocalDate.now();
-        this.originAccountCode = originAccountCode;
-        this.destinationAccountCode = destinationAccount;
+        this.accountOwnerCode = accountOwnerCode;
+        this.counterpartyAccountCode = counterpartyAccountCode;
         this.description = description != null ? description : "Transaction made.";
         this.status = TransactionStatus.PENDING;
         this.authenticationCode = generateAuthenticationCode();
@@ -104,12 +104,12 @@ public class Transaction {
         return dateTime;
     }
 
-    public String getOriginAccountCode() {
-        return originAccountCode;
+    public String getAccountOwnerCode() {
+        return accountOwnerCode;
     }
 
-    public String getDestinationAccountCode() {
-        return destinationAccountCode;
+    public String getCounterpartyAccountCode() {
+        return counterpartyAccountCode;
     }
 
     public String getDescription() {
@@ -161,8 +161,8 @@ public class Transaction {
                 previousBalance,
                 balanceAfter,
                 dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
-                originAccountCode != null ? originAccountCode : "N/A",
-                destinationAccountCode != null ? destinationAccountCode : "N/A",
+                accountOwnerCode != null ? accountOwnerCode : "N/A",
+                counterpartyAccountCode != null ? counterpartyAccountCode : "N/A",
                 status.getDescription(),
                 authenticationCode,
                 description
