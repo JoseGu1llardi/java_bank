@@ -26,9 +26,11 @@ public class TransactionRepository {
 
         transactions.put(transactionId, transaction);
 
-        // Update account index
-        transactionsByAccount.computeIfAbsent(transaction.getOriginAccountCode(),
-                k -> new ArrayList<>()).add(transactionId);
+        // Index by transaction OWNER account
+        transactionsByAccount
+                .computeIfAbsent(transaction.getAccountOwnerCode(),
+                k -> new ArrayList<>())
+                .add(transactionId);
     }
 
     // Search transaction by ID
