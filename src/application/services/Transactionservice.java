@@ -75,11 +75,11 @@ public class Transactionservice {
     /**
      * Transfers funds between accounts; persists origin transaction
      */
-    public void transfer(String originAccountCode, String destinationAccountCode, BigDecimal amount) {
-        Account originAccount = accountRepository.getByCode(originAccountCode).
+    public void transfer(String accountOwnerCode, String counterpartyAccountCode, BigDecimal amount) {
+        Account originAccount = accountRepository.getByCode(accountOwnerCode).
                 orElseThrow(AccountNotFoundException::new);
 
-        Account destinationAccount = accountRepository.getByCode(destinationAccountCode)
+        Account destinationAccount = accountRepository.getByCode(counterpartyAccountCode)
                 .orElseThrow(AccountNotFoundException::new);
 
         BigDecimal originPreviousBalance = originAccount.getBalance();
@@ -91,8 +91,8 @@ public class Transactionservice {
                 TransactionType.TRANSFER_SENT,
                 amount,
                 originPreviousBalance,
-                originAccountCode,
-                destinationAccountCode,
+                accountOwnerCode,
+                counterpartyAccountCode,
                 "Transfer sent"
         );
 
@@ -100,8 +100,8 @@ public class Transactionservice {
                 TransactionType.TRANSFER_RECEIVED,
                 amount,
                 destinationPreviousBalance,
-                originAccountCode,
-                destinationAccountCode,
+                counterpartyAccountCode,
+                accountOwnerCode,
                 "Transfer received"
         );
 
