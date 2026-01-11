@@ -18,7 +18,7 @@ public class Transaction {
     private final BigDecimal amount;
     private final BigDecimal previousBalance;
     private final BigDecimal balanceAfter;
-    private final LocalDate dateTime;
+    private final LocalDateTime dateTime;
 
     private final String accountOwnerCode;
     private final String counterpartyAccountCode;
@@ -37,7 +37,7 @@ public class Transaction {
         this.amount = amount.setScale(2, RoundingMode.HALF_EVEN);
         this.previousBalance = previousBalance.setScale(2, RoundingMode.HALF_EVEN);
         this.balanceAfter = calculateBalanceAfter();
-        this.dateTime = LocalDate.now();
+        this.dateTime = LocalDateTime.now();
         this.accountOwnerCode = accountOwnerCode;
         this.counterpartyAccountCode = counterpartyAccountCode;
         this.description = description != null ? description : "Transaction made.";
@@ -100,7 +100,7 @@ public class Transaction {
         return balanceAfter;
     }
 
-    public LocalDate getDateTime() {
+    public LocalDateTime getDateTime() {
         return dateTime;
     }
 

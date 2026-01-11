@@ -11,6 +11,7 @@ import domain.model.Transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,11 +76,11 @@ public class Transactionservice {
     /**
      * Transfers funds between accounts; persists origin transaction
      */
-    public void transfer(String accountOwnerCode, String counterpartyAccountCode, BigDecimal amount) {
-        Account originAccount = accountRepository.getByCode(accountOwnerCode).
+    public void transfer(String originAccountCode, String destinationAccountCode, BigDecimal amount) {
+        Account originAccount = accountRepository.getByCode(originAccountCode).
                 orElseThrow(AccountNotFoundException::new);
 
-        Account destinationAccount = accountRepository.getByCode(counterpartyAccountCode)
+        Account destinationAccount = accountRepository.getByCode(destinationAccountCode)
                 .orElseThrow(AccountNotFoundException::new);
 
         BigDecimal originPreviousBalance = originAccount.getBalance();
@@ -91,8 +92,8 @@ public class Transactionservice {
                 TransactionType.TRANSFER_SENT,
                 amount,
                 originPreviousBalance,
-                accountOwnerCode,
-                counterpartyAccountCode,
+                originAccountCode,
+                destinationAccountCode,
                 "Transfer sent"
         );
 
@@ -100,8 +101,8 @@ public class Transactionservice {
                 TransactionType.TRANSFER_RECEIVED,
                 amount,
                 destinationPreviousBalance,
-                counterpartyAccountCode,
-                accountOwnerCode,
+                destinationAccountCode,
+                originAccountCode,
                 "Transfer received"
         );
 
@@ -183,7 +184,11 @@ public class Transactionservice {
     /**
      * Gets transaction history for a specific period
      */
-    public List<Transaction> getStatement(String accountCode, LocalDate startDateTime, LocalDate endDateTime) {
+    public List<Transaction> getStatement(
+            String accountCode,
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime
+    ) {
         return transactionRepository.findByAccountCodeAndDateBetween(accountCode, startDateTime, endDateTime);
     }
 
@@ -210,8 +215,8 @@ public class Transactionservice {
      * type during the specified period.
      */
     public Map<TransactionType, BigDecimal> getStatementExpensesByTypeAndDate(String accountCode,
-                                                                              LocalDate startDate,
-                                                                              LocalDate endDate) {
+                                                                              LocalDateTime startDate,
+                                                                              LocalDateTime endDate) {
         accountRepository.getByCode(accountCode).orElseThrow(AccountNotFoundException::new);
 
         return transactionRepository.calculateTotalByType(accountCode, startDate,  endDate);

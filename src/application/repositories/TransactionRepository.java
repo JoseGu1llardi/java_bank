@@ -56,7 +56,7 @@ public class TransactionRepository {
      * Search for transactions of an account in a specific period
      */
     public List<Transaction> findByAccountCodeAndDateBetween(String accountCode,
-                                                     LocalDate startDate, LocalDate endDate) {
+                                                     LocalDateTime startDate, LocalDateTime endDate) {
         // Filters account transactions by date range
         return getByAccountCode(accountCode).stream()
                 .filter( t -> !t.getDateTime().isBefore(startDate) &&
@@ -94,8 +94,8 @@ public class TransactionRepository {
      * and adds up the values of each type, returning the total amount of
      * money moved in each category
      */
-    public Map<TransactionType, BigDecimal> calculateTotalByType(String accountCode, LocalDate startDate,
-                                                        LocalDate endDate) {
+    public Map<TransactionType, BigDecimal> calculateTotalByType(String accountCode, LocalDateTime startDate,
+                                                        LocalDateTime endDate) {
         return findByAccountCodeAndDateBetween(accountCode, startDate, endDate).stream()
                 .collect(Collectors.groupingBy(
                         Transaction::getType,
