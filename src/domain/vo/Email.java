@@ -25,11 +25,11 @@ public record Email(String address) {
         return new Email(address);
     }
 
-    public String getUsuario() {
+    public String getUser() {
         return address.substring(0, address.indexOf('@'));
     }
 
-    public String getDominio() {
+    public String getDomain() {
         return address.substring(address.indexOf('@') + 1);
     }
 }
