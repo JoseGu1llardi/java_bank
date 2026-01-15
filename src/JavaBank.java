@@ -101,7 +101,7 @@ public class JavaBank {
             System.out.println("Jose's Checking Account before: " + joseCheckingBalance);
 
             BigDecimal elisaBalance = leticiaCheckingAccount.getBalance();
-            System.out.println("Elisa's balance before: " + elisaBalance);
+            System.out.println("Leticia's balance before: " + elisaBalance);
 
             transactionservice.transfer(
                     joseCheckingAccount.getAccountCode(),
@@ -111,16 +111,24 @@ public class JavaBank {
 
             System.out.println();
 
+            System.out.println("Transfer Completed");
             BigDecimal joseBalanceAfter = joseCheckingAccount.getBalance();
             System.out.println("Jose's Balance after: " + joseBalanceAfter);
 
-            BigDecimal elisaBalanceAfter = leticiaCheckingAccount.getBalance();
-            System.out.println("Elisa's Balance after: " + elisaBalanceAfter);
+            BigDecimal leticiaBalanceAfter = leticiaCheckingAccount.getBalance();
+            System.out.println("Leticia's Balance after: " + leticiaBalanceAfter);
             System.out.println();
 
             // Shows if the transfers were carried out successfully for their due accounts
             System.out.println(transactionservice.getStatement(joseCheckingAccount.getAccountCode()));
             System.out.println(transactionservice.getStatement(leticiaCheckingAccount.getAccountCode()));
+            System.out.println();
+
+            System.out.println("CONSULTING EXTRACT...");
+            System.out.println("Jose's Checking Account extract: ");
+            transactionservice.getStatement(joseCheckingAccount.getAccountCode()).forEach(System.out::println);
+            System.out.println();
+
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
