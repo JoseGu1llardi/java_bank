@@ -17,6 +17,7 @@ public class SavingsAccount extends Account {
     public SavingsAccount(String branch, User holder) {
         super(branch, holder);
         this.anniversaryDate = LocalDate.now();
+        this.lastIncome = LocalDate.now();
     }
 
     public SavingsAccount(String agency, User holder, BigDecimal rateReturn) {
