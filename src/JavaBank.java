@@ -129,6 +129,27 @@ public class JavaBank {
             transactionservice.getStatement(joseCheckingAccount.getAccountCode()).forEach(System.out::println);
             System.out.println();
 
+            System.out.println("APPLYING INCOME - ONLY SAVINGS ACCOUNT");
+            // Should not work
+            try {
+                transactionservice.applyYield(joseCheckingAccount.getAccountCode());
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+            System.out.println();
+            // Should work
+            try {
+                BigDecimal joseSavingBalance = joseSavingsAccount.getBalance();
+                System.out.println("Jose's Saving Account before: " + joseSavingBalance);
+
+                transactionservice.applyYield(joseSavingsAccount.getAccountCode());
+
+                System.out.println("Jose's Balance after: " + joseSavingBalance);
+
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
