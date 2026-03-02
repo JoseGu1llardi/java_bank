@@ -1,514 +1,449 @@
-# 🏦 Banking System - Demonstration of the 4 OOP Pillars
+# Java Bank — OOP Banking System
 
-![Java](https://img.shields.io/badge/Java-17+-orange?style=flat-square&logo=java)
+![Java](https://img.shields.io/badge/Java-17+-orange?style=flat-square&logo=openjdk)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Educational-blue?style=flat-square)
+![Architecture](https://img.shields.io/badge/Architecture-Layered-purple?style=flat-square)
 
-> Educational banking system developed in pure Java to demonstrate the practical application of the 4 pillars of Object-Oriented Programming: **Encapsulation**, **Abstraction**, **Inheritance**, and **Polymorphism**.
+> An educational banking system built in pure Java to demonstrate the four pillars of Object-Oriented Programming — **Encapsulation**, **Abstraction**, **Inheritance**, and **Polymorphism** — through a real-world domain.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [About the Project](#about-the-project)
+- [About](#about)
 - [Features](#features)
 - [OOP Pillars Applied](#oop-pillars-applied)
 - [Architecture](#architecture)
-- [Folder Structure](#folder-structure)
+- [Project Structure](#project-structure)
 - [How to Run](#how-to-run)
 - [Usage Examples](#usage-examples)
 - [Future Enhancements](#future-enhancements)
 - [Contributing](#contributing)
 - [License](#license)
+- [Author](#author)
 
 ---
 
-## 🎯 About the Project
+## About
 
-This project was developed as an educational tool to learn and practice the fundamental concepts of Object-Oriented Programming. Through a familiar domain (banking system), it demonstrates how to apply each of the 4 OOP pillars in a practical and scalable way.
+This project was created as a hands-on study of OOP fundamentals. The banking domain is intentionally familiar so the focus stays on the design patterns rather than the business problem itself.
 
-### Learning Objectives
+**Learning objectives:**
 
-- ✅ Understand and apply **Encapsulation** to protect data
-- ✅ Use **Abstraction** to define contracts and common behaviors
-- ✅ Implement **Inheritance** to reuse code and create hierarchies
-- ✅ Explore **Polymorphism** to create flexible and extensible code
+- Apply **Encapsulation** to protect internal state and enforce invariants
+- Use **Abstraction** to define shared contracts via abstract classes
+- Implement **Inheritance** to share and extend behaviour across account types
+- Leverage **Polymorphism** so the same operation behaves differently per type
+
+**Additional concepts covered:**
+
+- Value Objects (`CPF`, `Email`) implemented as Java `record`s
+- Repository Pattern for decoupled in-memory persistence
+- Service Layer to centralise business logic
+- Constructor-based Dependency Injection
+- `BigDecimal` for precise monetary arithmetic
+- `Optional` to represent absence without `null`
 
 ---
 
-## ⚡ Features
+## Features
 
 ### User Management
-- ✨ Bank customer registration
-- ✨ Social Security Number validation
-- ✨ Personal data management
+- Register bank customers with name, CPF (Brazilian tax ID), and email
+- CPF validation: strips formatting, enforces 11 digits, rejects all-same-digit sequences
+- Email validation via regex, normalised to lowercase
+- Email change with duplicate-check guard
 
 ### Account Types
-- 💳 **Checking Account**
-    - Overdraft protection ($500.00)
-    - Monthly fee ($12.00)
-    - Allows negative balance up to limit
 
-- 💰 **Savings Account**
-    - Monthly yield (0.5%)
-    - No fees
-    - Does not allow negative balance
+| Feature | Checking Account | Savings Account |
+|---|---|---|
+| Overdraft | Yes — $500.00 default | No |
+| Monthly fee | $12.00 (waived if balance ≥ $1,000) | None |
+| Monthly yield | No | 0.5% on anniversary date |
+| Negative balance | Up to overdraft limit | Not allowed |
 
 ### Banking Operations
-- 💵 Deposit
-- 💸 Withdrawal (with specific rules per account type)
-- 🔄 Transfer between accounts
-- 📊 Balance inquiry
-- 📝 Detailed transaction statement
+- Deposit
+- Withdrawal (rules enforced per account type)
+- Transfer between accounts
+- Account statement (full history, date-range, or last N transactions)
+- Expenses grouped by transaction type
 
-### Administrative Features
-- 📈 Apply yields (savings accounts)
-- 💰 Charge fees (checking accounts)
-- 🔍 List accounts by user
+### Administrative Operations
+- Apply yield — savings accounts only
+- Charge monthly fee — checking accounts only
+- Deactivate account (only when balance is exactly zero)
+
+### Transaction Tracking
+Each transaction records: ID, type, amount, previous balance, balance after, timestamp, origin/destination account codes, status, and an authentication code.
+
+**Supported transaction types:** `DEPOSIT`, `WITHDRAW`, `TRANSFER_SENT`, `TRANSFER_RECEIVED`, `BILL_PAYMENT`, `PIX_PAYMENT`, `TED`, `DOC`, `REVERSAL`, `INTEREST`, `FEE`, `YIELD`
+
+**Transaction lifecycle:** `PENDING` → `CONFIRMED` / `CANCELLED`
 
 ---
 
-## 🎓 OOP Pillars Applied
+## OOP Pillars Applied
 
-### 1️⃣ Encapsulation
+### 1. Encapsulation
 
-**Where**: `User`, `Account`, `Transaction` classes
+Private fields and validation methods prevent the domain from entering an invalid state. All modifications go through controlled public methods.
 
 ```java
-// Private attributes with validation
-private String ssn;
-
-private String validateSsn(String ssn) {
-    String cleanSsn = ssn.replaceAll("[^0-9]", "");
-    if (cleanSsn.length() != 11) {
-        throw new IllegalArgumentException("Invalid SSN");
+// domain/vo/CPF.java — value object enforces its own invariants
+public record CPF(String value) {
+    public CPF(String value) {
+        String validCPF = value.replaceAll("\\D", "");
+        if (validCPF.length() != 11)
+            throw new IllegalArgumentException("Invalid CPF: must contain 11 digits.");
+        if (validCPF.matches("(\\d)\\1{10}"))
+            throw new IllegalArgumentException("Invalid CPF: repeated digits are not allowed.");
+        this.value = validCPF;
     }
-    return cleanSsn;
 }
 
-// Controlled access via getter
-public String getSsn() { return ssn; }
+// domain/model/Account.java — balance is never modified directly from outside
+protected void validateAmount(BigDecimal amount) {
+    if (amount.compareTo(BigDecimal.ZERO) <= 0)
+        throw new IllegalArgumentException("The amount must be greater than zero.");
+}
 ```
 
-**Benefits**:
-- Protection against invalid modifications
-- Centralized validation
-- Immutable transaction history
+### 2. Abstraction
 
----
-
-### 2️⃣ Abstraction
-
-**Where**: Abstract class `Account`
+`Account` defines the common contract (deposit, transfer, account code generation) and delegates type-specific behaviour to subclasses via abstract methods.
 
 ```java
+// domain/model/Account.java
 public abstract class Account {
-    // Common behavior implemented
-    public void deposit(double amount) {
-        validateAmount(amount);
-        this.balance += amount;
-        recordTransaction("DEPOSIT", amount, null);
-    }
-    
-    // Specific behavior delegated to subclasses
-    public abstract void withdraw(double amount);
-    public abstract double calculateMonthlyFee();
+    // Shared, fully-implemented behaviour
+    public void deposit(BigDecimal amount) { ... }
+    public void transfer(Account destination, BigDecimal amount) { ... }
+
+    // Contract: each subclass must define its own rules
+    public abstract void withdraw(BigDecimal amount);
+    public abstract BigDecimal calculateMonthlyFee();
 }
 ```
 
-**Benefits**:
-- Defines "contract" for all accounts
-- Reuses common code
-- Enforces consistency between implementations
+### 3. Inheritance
 
----
-
-### 3️⃣ Inheritance
-
-**Where**: `CheckingAccount` and `SavingsAccount` inherit from `Account`
+`CheckingAccount` and `SavingsAccount` extend `Account`, inheriting common fields and methods while adding type-specific logic.
 
 ```java
+// domain/model/CheckingAccount.java
 public class CheckingAccount extends Account {
-    private double overdraftLimit;
-    
-    public CheckingAccount(String branch, User owner) {
-        super(branch, owner);  // Reuses parent constructor
-        this.overdraftLimit = 500.0;
+    private BigDecimal overdraftLimit;        // adds new state
+    private static final BigDecimal MONTHLY_FEE = BigDecimal.valueOf(12.0);
+
+    public CheckingAccount(String branch, User holder) {
+        super(branch, holder);               // reuses parent constructor
+        this.overdraftLimit = BigDecimal.valueOf(500.0);
     }
-    
-    // Inherits: deposit(), transfer(), getters...
+
+    // Inherits: deposit(), transfer(), getBalance(), getAccountCode() ...
 }
 ```
 
-**Benefits**:
-- Code reuse
-- Logical and natural hierarchy
-- Easy to add new account types
+### 4. Polymorphism
 
----
-
-### 4️⃣ Polymorphism
-
-**Where**: Overridden methods and polymorphic collections
+The same `withdraw` call produces different results at runtime depending on the concrete type — checking accounts allow overdraft, savings accounts do not.
 
 ```java
-// Same method, different behaviors
-Account cc = new CheckingAccount(...);
-Account sa = new SavingsAccount(...);
+Account checking = new CheckingAccount("0001", user);
+Account savings  = new SavingsAccount("0001", user);
 
-cc.withdraw(1500);  // Allows overdraft
-sa.withdraw(1500);  // Throws exception if insufficient balance
+checking.withdraw(BigDecimal.valueOf(1800)); // OK — uses overdraft
+savings.withdraw(BigDecimal.valueOf(1200));  // throws InsufficientFundsException
 
-// Polymorphic collections
-List<Account> accounts = new ArrayList<>();
-accounts.add(new CheckingAccount(...));
-accounts.add(new SavingsAccount(...));
-
-accounts.forEach(account -> {
-    // Calls the correct method at runtime
-    double fee = account.calculateMonthlyFee();
-});
+// Works uniformly across a mixed collection
+List<Account> accounts = List.of(checking, savings);
+accounts.forEach(a -> System.out.println(a.calculateMonthlyFee()));
+// CheckingAccount → $12.00 (or $0 if balance high enough)
+// SavingsAccount  → $0.00
 ```
-
-**Benefits**:
-- Flexible and extensible code
-- Reduces duplication
-- Facilitates maintenance
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
-The project follows a layered architecture, promoting separation of concerns:
+The project follows a three-layer architecture that separates concerns and keeps the domain free of infrastructure dependencies.
 
 ```
-┌─────────────────────────────────────┐
-│   Application (Main)                │  ← Entry point
-├─────────────────────────────────────┤
-│   Service Layer                     │  ← Business logic
-│   • UserService                     │
-│   • AccountService                  │
-│   • TransactionService              │
-├─────────────────────────────────────┤
-│   Model Layer                       │  ← Domain entities
-│   • User                            │
-│   • Account (abstract)              │
-│   • CheckingAccount, SavingsAccount │
-│   • Transaction                     │
-├─────────────────────────────────────┤
-│   Repository Layer                  │  ← Persistence
-│   • UserRepository                  │
-│   • AccountRepository               │
-│   • TransactionRepository           │
-└─────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│  JavaBank.java  (entry point / demo)     │
+├──────────────────────────────────────────┤
+│  application/services/                   │  ← Business logic
+│    UserService                           │
+│    AccountService                        │
+│    TransactionService                    │
+├──────────────────────────────────────────┤
+│  application/repositories/               │  ← In-memory persistence
+│    UserRepository                        │
+│    AccountRepository                     │
+│    TransactionRepository                 │
+├──────────────────────────────────────────┤
+│  domain/                                 │  ← Core domain (no dependencies)
+│    model/   Account · CheckingAccount    │
+│             SavingsAccount · Transaction │
+│             User                         │
+│    vo/      CPF · Email                  │
+│    enums/   TransactionType              │
+│             TransactionStatus            │
+│    exception/ AccountNotFoundException   │
+│               UserNotFoundException      │
+│               InsufficientFundsException │
+│               EmailAlreadyInUseException │
+│               EmailUnchangedException    │
+└──────────────────────────────────────────┘
 ```
 
-### Design Patterns Implemented
+### Design Patterns
 
-- 🎨 **Template Method**: `Account` class with `transfer()` method
-- 🎨 **Repository Pattern**: Decoupled persistence layer
-- 🎨 **Service Layer**: Centralized business logic
-- 🎨 **Dependency Injection**: Injection via constructor
+| Pattern | Where |
+|---|---|
+| **Repository** | `UserRepository`, `AccountRepository`, `TransactionRepository` |
+| **Service Layer** | `UserService`, `AccountService`, `TransactionService` |
+| **Template Method** | `Account.transfer()` delegates validation then calls type-specific logic |
+| **Value Object** | `CPF` and `Email` as immutable `record`s |
+| **Constructor Injection** | All services receive their repositories via constructor |
 
 ---
 
-## 📁 Folder Structure
+## Project Structure
 
 ```
-banking-system/
-│
+java_bank/
 ├── src/
-│   └── com/
-│       └── bank/
-│           ├── model/
-│           │   ├── User.java
-│           │   ├── Account.java
-│           │   ├── CheckingAccount.java
-│           │   ├── SavingsAccount.java
-│           │   └── Transaction.java
-│           │
-│           ├── service/
-│           │   ├── UserService.java
-│           │   ├── AccountService.java
-│           │   └── TransactionService.java
-│           │
-│           ├── repository/
-│           │   ├── UserRepository.java
-│           │   ├── AccountRepository.java
-│           │   └── TransactionRepository.java
-│           │
-│           ├── exception/
-│           │   ├── InsufficientBalanceException.java
-│           │   ├── AccountNotFoundException.java
-│           │   └── UserNotFoundException.java
-│           │
-│           └── BankingApplication.java
+│   ├── JavaBank.java                          ← Entry point (simulation demo)
+│   │
+│   ├── application/
+│   │   ├── repositories/
+│   │   │   ├── AccountRepository.java
+│   │   │   ├── TransactionRepository.java
+│   │   │   └── UserRepository.java
+│   │   └── services/
+│   │       ├── AccountService.java
+│   │       ├── Transactionservice.java
+│   │       └── UserService.java
+│   │
+│   └── domain/
+│       ├── enums/
+│       │   ├── TransactionStatus.java
+│       │   └── TransactionType.java
+│       ├── exception/
+│       │   ├── AccountNotFoundException.java
+│       │   ├── EmailAlreadyInUseException.java
+│       │   ├── EmailUnchangedException.java
+│       │   ├── IllegalStateException.java
+│       │   ├── InsufficientFundsException.java
+│       │   └── UserNotFoundException.java
+│       ├── model/
+│       │   ├── Account.java
+│       │   ├── CheckingAccount.java
+│       │   ├── SavingsAccount.java
+│       │   ├── Transaction.java
+│       │   └── User.java
+│       └── vo/
+│           ├── CPF.java
+│           └── Email.java
 │
-├── docs/
-│   └── oop-guide.md
-│
+├── java_bank.iml
 └── README.md
 ```
 
 ---
 
-## 🚀 How to Run
+## How to Run
 
 ### Prerequisites
 
 - Java JDK 17 or higher
-- IDE of your choice (IntelliJ IDEA, Eclipse, VS Code)
+- An IDE such as IntelliJ IDEA (recommended), Eclipse, or VS Code with the Java Extension Pack
 
-### Steps
+### Running in IntelliJ IDEA
 
-1. **Clone the repository** (or copy the files)
+1. **Clone the repository**
 
 ```bash
-git clone https://github.com/JoseGu1llardi/java_bank#
+git clone https://github.com/JoseGu1llardi/java_bank.git
 cd java_bank
 ```
 
-2. **Compile the project**
+2. **Open the project**
+   - Open IntelliJ IDEA → `File` → `Open` → select the `java_bank` folder
+   - Mark `src/` as the Sources Root if not already configured
+
+3. **Run the entry point**
+   - Open `src/JavaBank.java`
+   - Click the green **Run** arrow next to `main()`
+
+### Running from the command line
 
 ```bash
-# Via command line
-javac -d bin src/com/bank/**/*.java
+# Compile all sources
+javac -d out/production/java_bank $(find src -name "*.java")
 
-# Or use your favorite IDE
+# Run the entry point
+java -cp out/production/java_bank JavaBank
 ```
 
-3. **Run the application**
-
-```bash
-java -cp bin com.bank.BankingApplication
-```
-
-### Expected Output
+### Expected output (excerpt)
 
 ```
-=== BANKING SYSTEM - DEMONSTRATION ===
+========== BANKING SYSTEM ==========
+CREATING USERS...
+Users created successfully: Jose Guillard, Leticia Castro
 
-1. CREATING USERS
-✓ Users created: John Silva, Mary Santos
+CREATING ACCOUNTS...
+Checking Account Jose: 000112345678
+Saving Account Jose:   000187654321
+Checking Account Leticia: 000111223344
 
-2. CREATING ACCOUNTS
-✓ Checking Account John: 12345678
-✓ Savings Account John: 87654321
-✓ Checking Account Mary: 11223344
-
-3. MAKING DEPOSITS
-✓ Checking Account Balance John: $ 1000.0
-✓ Savings Account Balance John: $ 5000.0
+MAKING DEPOSIT...
 ...
+PERFORMING TRANSFER...
+Jose's Checking Account before: 1500.00
+Leticia's balance before: 2000.00
+Transfer Completed
+Jose's Balance after: 1000.00
+Leticia's Balance after: 2500.00
+...
+APPLYING INCOME - ONLY SAVINGS ACCOUNT
+Only savings account can receive yield
 ```
 
 ---
 
-## 💡 Usage Examples
+## Usage Examples
 
-### Create a User
+### Create users and accounts
 
 ```java
-UserService userService = new UserService(new UserRepository());
+UserRepository userRepository = new UserRepository();
+AccountRepository accountRepository = new AccountRepository();
+TransactionRepository transactionRepository = new TransactionRepository();
 
-User john = userService.createUser(
-    "John Silva", 
-    "123-456-789-00", 
-    "john@email.com"
-);
+UserService userService = new UserService(userRepository);
+AccountService accountService = new AccountService(accountRepository, userRepository);
+Transactionservice transactionService = new Transactionservice(accountRepository, transactionRepository);
+
+// Create a user — CPF and email are validated automatically
+User user = userService.createUser("Jose Guillard", "438-900-898-60", "jose@email.com");
+
+// Create accounts
+Account checking = accountService.createCheckingAccount("0001", user.getId());
+Account savings  = accountService.createSavingAccount("0001", user.getId());
 ```
 
-### Create Accounts
+### Perform transactions
 
 ```java
-AccountService accountService = new AccountService(
-    new AccountRepository(), 
-    new UserRepository()
-);
-
-// Polymorphism: both return Account type
-Account checkingAccount = accountService.createCheckingAccount("0001", john.getId());
-Account savingsAccount = accountService.createSavingsAccount("0001", john.getId());
-```
-
-### Perform Operations
-
-```java
-TransactionService transactionService = new TransactionService(
-    new AccountRepository(),
-    new TransactionRepository()
-);
-
 // Deposit
-transactionService.deposit("0001", checkingAccount.getNumber(), 1000.0);
+transactionService.deposit(checking.getAccountCode(), BigDecimal.valueOf(1500));
+transactionService.deposit(savings.getAccountCode(),  BigDecimal.valueOf(1000));
 
-// Withdrawal (polymorphism: each type has its own rule)
-transactionService.withdraw("0001", checkingAccount.getNumber(), 1200.0); // ✓ OK with overdraft
-transactionService.withdraw("0001", savingsAccount.getNumber(), 6000.0);  // ✗ Insufficient balance
+// Withdrawal — checking allows overdraft, savings does not
+transactionService.withdraw(checking.getAccountCode(), BigDecimal.valueOf(1800)); // OK
+try {
+    transactionService.withdraw(savings.getAccountCode(), BigDecimal.valueOf(1200)); // throws
+} catch (InsufficientFundsException e) {
+    System.out.println("Denied: " + e.getMessage());
+}
 
 // Transfer
 transactionService.transfer(
-    "0001", checkingAccount.getNumber(),
-    "0001", savingsAccount.getNumber(),
-    500.0
+    checking.getAccountCode(),
+    savings.getAccountCode(),
+    BigDecimal.valueOf(500)
+);
+```
+
+### Query statements
+
+```java
+// Full history (sorted newest-first)
+List<Transaction> history = transactionService.getStatement(checking.getAccountCode());
+history.forEach(System.out::println);
+
+// Last 5 transactions
+List<Transaction> recent = transactionService.getRecentStatement(checking.getAccountCode(), 5);
+
+// Date-range statement
+List<Transaction> period = transactionService.getStatement(
+    checking.getAccountCode(),
+    LocalDateTime.of(2025, 1, 1, 0, 0),
+    LocalDateTime.of(2025, 12, 31, 23, 59)
 );
 
-// Query statement
-List<Transaction> statement = transactionService.getStatement("0001", checkingAccount.getNumber());
-statement.forEach(System.out::println);
+// Expenses grouped by type
+Map<TransactionType, BigDecimal> breakdown =
+    transactionService.getStatementExpensesByType(checking.getAccountCode());
 ```
 
-### Administrative Operations
+### Administrative operations
 
 ```java
-// Apply yields only to savings accounts
-transactionService.applyMonthlyInterest();
+// Apply monthly fee to checking accounts (only charged if balance < $1,000)
+transactionService.chargeFee(checking.getAccountCode());
 
-// Charge fees only from checking accounts
-transactionService.chargeMonthlyFees();
+// Apply monthly yield to savings accounts (0.5%, once per anniversary date)
+transactionService.applyYield(savings.getAccountCode());
+
+// Deactivate an account (balance must be zero)
+accountService.deactivateAccount(checking.getAccountCode());
 ```
 
 ---
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
-### Planned Features
-
-#### 🔐 Authentication System
-```java
-public class Credential {
-    private String passwordHash;
-    private LocalDateTime lastAccess;
-    private int failedAttempts;
-}
-
-public class AuthenticationService {
-    public boolean authenticate(String ssn, String password);
-    public void changePassword(String userId, String oldPassword, String newPassword);
-}
-```
-
-#### 💎 Premium Account
-```java
-public class PremiumCheckingAccount extends CheckingAccount {
-    @Override
-    public double calculateMonthlyFee() {
-        return this.balance > 5000 ? 0.0 : 12.0;
-    }
-}
-```
-
-#### 📊 Limits and Controls
-```java
-public abstract class Account {
-    protected double dailyWithdrawalLimit;
-    protected double dailyTransferLimit;
-    protected Map<LocalDate, Double> dailyOperations;
-}
-```
-
-#### 📈 Advanced Reports
-```java
-public class ReportService {
-    public List<Transaction> findByPeriod(LocalDate start, LocalDate end);
-    public Map<String, Double> groupByType(List<Transaction> transactions);
-    public double calculateMonthlyAverage(Account account);
-}
-```
-
-#### 🗄️ Real Persistence
-```java
-// Replace HashMap with JDBC or JPA
-public class AccountRepositoryJDBC implements IAccountRepository {
-    @Override
-    public void save(Account account) {
-        // Real database connection
-    }
-}
-```
-
-#### 🔔 Notification System
-```java
-public interface AccountObserver {
-    void onTransaction(Transaction transaction);
-    void onLowBalance(double balance);
-}
-```
+- **Authentication** — credential management with password hashing and login attempt limits
+- **Premium account type** — `PremiumCheckingAccount` with higher fee-waiver threshold
+- **Daily limits** — per-account daily withdrawal and transfer caps
+- **Real persistence** — replace `HashMap` repositories with JDBC or JPA
+- **Observer / event system** — notify on low balance, large transactions, etc.
+- **Unit tests** — JUnit 5 test suite covering domain logic and services
+- **REST API** — expose operations via Spring Boot controllers
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! This is an educational project and improvements are always appreciated.
 
-### How to Contribute
-
-1. Fork the project
-2. Create a feature branch (`git checkout -b feature/NewFeature`)
-3. Commit your changes (`git commit -m 'Add new feature'`)
-4. Push to the branch (`git push origin feature/NewFeature`)
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m 'Add your feature'`
+4. Push to the branch: `git push origin feature/your-feature`
 5. Open a Pull Request
 
-### Contribution Suggestions
-
-- 📝 Improve documentation
-- 🧪 Add unit tests
-- ✨ Implement new features
-- 🐛 Fix bugs
-- 🎨 Improve design patterns
+**Contribution ideas:** unit tests, new account types, Javadoc improvements, design pattern refactors, build system setup (Maven/Gradle).
 
 ---
 
-## 📚 Additional Resources
+## License
 
-### Project Documentation
-
-- 📖 [Complete Guide to the 4 OOP Pillars](docs/oop-guide.md)
-- 🎯 [UML Diagrams](docs/diagrams/)
-- 📊 [Use Cases](docs/use-cases.md)
-
-### Learning
-
-- [Oracle Java Tutorials](https://docs.oracle.com/javase/tutorial/)
-- [Effective Java - Joshua Bloch](https://www.oreilly.com/library/view/effective-java/9780134686097/)
-- [Head First Design Patterns](https://www.oreilly.com/library/view/head-first-design/0596007124/)
+This project is licensed under the MIT License. See the [LICENSE](java_bank/LICENSE) file for details.
 
 ---
 
-## 📝 License
+## Author
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+**José Guillardi**
 
----
-
-## 👨‍💻 Author
-
-Developed as an educational project to demonstrate OOP concepts.
-
----
-
-## ⭐ Acknowledgments
-
-- Thank you for using this project as study material!
-- If this project helped you, consider giving it a ⭐
-- Share it with other programming students!
-
----
-
-## 📞 Contact
-
-For questions, suggestions, or feedback:
-
-- 📧 Email: junior11_junior@hotmail.com
-- 💼 LinkedIn: [Jose Guillard](https://www.linkedin.com/in/jos%C3%A9-wellington-ribeiro-a26418163/)
-- 🐙 GitHub: [JoseGu1llardi](https://github.com/JoseGu1llardi?tab=overview&from=2026-01-01&to=2026-01-10)
+- Email: junior11_junior@hotmail.com
+- LinkedIn: [José Wellington Ribeiro](https://www.linkedin.com/in/jos%C3%A9-wellington-ribeiro-a26418163/)
+- GitHub: [JoseGu1llardi](https://github.com/JoseGu1llardi)
 
 ---
 
 <div align="center">
 
-**Made with ❤️ and Java ☕**
+Made with Java
 
-[⬆ Back to top](#-banking-system---demonstration-of-the-4-oop-pillars)
+[Back to top](#java-bank--oop-banking-system)
 
 </div>
